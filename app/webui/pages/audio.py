@@ -32,7 +32,7 @@ class AudioPage(Page):
     # Test emails:
     # go@yandex.ru;print; urea@gmai l.com, so@ydex.ru;print; urea@gmail.com
     def __filter_emails(self, emails: str) -> tuple:
-        return tuple(filter(self.re_email.findall, emails.replace(" ", "").split(";")))
+        return tuple(filter(self.re_email.findall, emails.split(";")))
 
     def _send_email(self, emails: tuple[str]):
         gr.Info(f"Отправлено уведомление для {emails} пользователей")
