@@ -20,7 +20,7 @@ class TestEmailSender(unittest.TestCase):
 
     def test_send_batch(self):
         self.assertIsNot(TEST_EMAIL, "")
-        emails = [Email(TEST_EMAIL, "test message")]
+        emails = [Email(TEST_EMAIL, "test message 1"), Email(TEST_EMAIL, "test message2")]
         self.sender.send_batch(emails)
 
 
