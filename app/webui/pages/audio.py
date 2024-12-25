@@ -4,19 +4,26 @@ import re
 import gradio as gr
 import numpy as np
 
-from app.services import AudioUploader, EmailSender
+from app.configs.settings import get_email_settings
+from app.services import AudioUploader, Email, EmailSender
 
 from .interfaces import Page
 
 logger = logging.getLogger("stdout")
+email_settings = get_email_settings()
+logger.debug(f"Email settings: {email_settings}")
 
 
 class AudioPage(Page):
     re_email = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+    email_message = """Здравствуйте!
+    \n Вы получили аудио запрос на отправку в моей группе.
+    \n Если вы получили это сообщение по ошибке, то сообщите мне по email или в чате.
+    """
 
     def __init__(self):
         self.audio_uploader = AudioUploader()
-        self.email_sender = EmailSender()
+        self.email_sender = EmailSender(email_settings)
         self.theme = gr.themes.Ocean(
             primary_hue="fuchsia",
             neutral_hue="indigo",
@@ -27,10 +34,12 @@ class AudioPage(Page):
     def __filter_emails(self, emails: str) -> tuple:
         return tuple(filter(self.re_email.findall, emails.replace(" ", "").split(";")))
 
-    def _send_email(self, emails: tuple):
+    def _send_email(self, emails: tuple[str]):
         gr.Info(f"Отправлено уведомление для {emails} пользователей")
         logger.info(f"Sending emails to {emails}")
-        self.email_sender.execute(emails)
+
+        g_emails = (Email(email, self.email_message) for email in emails)
+        self.email_sender.execute(g_emails)
         return emails
 
     def __do(self, audio: np.ndarray, raw_emails: str, checbox_speed: bool):
