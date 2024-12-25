@@ -24,10 +24,7 @@ class AudioPage(Page):
     def __init__(self):
         self.audio_uploader = AudioUploader()
         self.email_sender = EmailSender(email_settings)
-        self.theme = gr.themes.Ocean(
-            primary_hue="fuchsia",
-            neutral_hue="indigo",
-        )
+        self.theme = None
 
     # Test emails:
     # go@yandex.ru;print; urea@gmai l.com, so@ydex.ru;print; urea@gmail.com
