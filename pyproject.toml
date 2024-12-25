@@ -10,6 +10,7 @@ python = "^3.12"
 gradio = "^5.9.0"
 fastapi = "^0.115.6"
 uvicorn = "^0.34.0"
+pydantic-settings = "^2.7.0"
 
 
 [build-system]
