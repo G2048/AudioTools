@@ -17,8 +17,8 @@ logger.debug(f"Email settings: {email_settings}")
 class AudioPage(Page):
     re_email = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
     email_message = """Здравствуйте!
-    \n Вы получили аудио запрос на отправку в моей группе.
-    \n Если вы получили это сообщение по ошибке, то сообщите мне по email или в чате.
+    \nВы получили аудио запрос на отправку в моей группе.
+    \nЕсли вы получили это сообщение по ошибке, то сообщите мне по email или в чате.
     """
 
     def __init__(self):
@@ -42,7 +42,7 @@ class AudioPage(Page):
         self.email_sender.execute(g_emails)
         return emails
 
-    def __do(self, audio: np.ndarray, raw_emails: str, checbox_speed: bool):
+    def __do(self, audio: np.ndarray, raw_emails: str, checkbox_speed: bool):
         logger.debug(f"Audio: {audio}")
         if not audio:
             raise ValueError("Укажите аудио для загрузки.")
@@ -55,10 +55,10 @@ class AudioPage(Page):
             )
 
         self._send_email(emails)
-        self._upload_file(audio, checbox_speed)
+        self._upload_file(audio, checkbox_speed)
 
-    def _upload_file(self, audio: np.ndarray, checbox_speed: bool):
-        logger.info(f"Speed: {checbox_speed}")
+    def _upload_file(self, audio: np.ndarray, speed: bool):
+        logger.info(f"Speed: {speed}")
         logger.info(f"Uploading {len(audio)} files")
         gr.Info(f"Загрузка {audio} файлов")
         # file_paths = [file.name for file in files]
@@ -73,7 +73,7 @@ class AudioPage(Page):
         ) as app:
             gr.Markdown("# Upload audio")
 
-            gr.Markdown("### Укажите email'ы для отправки уведомления отправки аудио")
+            gr.Markdown("### Укажите email'ы для отправки уведомления загрузки аудио")
             with gr.Row(equal_height=True, variant="panel"):
                 with gr.Column(scale=1):
                     text_emails = gr.Textbox(
@@ -82,9 +82,6 @@ class AudioPage(Page):
                         show_copy_button=True,
                         info="Используйте ';' как разделитель для email'ов",
                         label="Введитe cписок email'ов:",
-                    )
-                    checbox_speed = gr.Checkbox(
-                        label="Быстро", info="Если выбрано, то будет увеличена скорость загрузки аудио"
                     )
             audio_input = gr.Audio(
                 interactive=True,
@@ -97,6 +94,17 @@ class AudioPage(Page):
                     # show_controls=False,
                 ),
             )
+            with gr.Row(equal_height=True, variant="panel"):
+                checbox_speed = gr.Checkbox(
+                    label="Быстро", info="Если выбрано, то будет увеличена скорость загрузки аудио"
+                )
+                gr.Textbox(
+                    lines=1,
+                    interactive=False,
+                    label="Время Загрузки:",
+                    show_copy_button=True,
+                    value="0:00:00.00",
+                )
             start_button = gr.Button(
                 "Отправить аудио",
                 size="lg",

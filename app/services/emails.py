@@ -9,8 +9,6 @@ from typing import Self, Sequence
 from app.configs.settings import EmailSettings
 
 logger = logging.getLogger("stdout")
-# settings = get_email_settings()
-# logger.debug(f"Email sender settings: {settings}")
 
 
 class Email:
