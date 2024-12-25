@@ -52,13 +52,13 @@ set_appname(_app_settings.appname)
 set_appversion(_app_settings.appversion)
 
 
-def get_appsettings():
+def get_appsettings() -> AppSettings:
     return _app_settings
 
 
-def get_database_settings():
+def get_database_settings() -> DataBaseSettings:
     return DataBaseSettings()
 
 
-def get_email_settings():
+def get_email_settings() -> EmailSettings:
     return EmailSettings()
