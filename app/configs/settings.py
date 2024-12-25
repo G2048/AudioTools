@@ -39,7 +39,6 @@ class EmailSettings(BaseSettings):
 
     host: str
     port: int = 587  # 587 for STARTTLS, 465 for SSL
-    user: str
     password: str
     sender: str
 
