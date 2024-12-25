@@ -10,7 +10,7 @@ load_dotenv()
 
 
 class AppSettings(BaseSettings):
-    appname: str = "reviewBI"
+    appname: str = "WebUI"
     appversion: str = "0.0.1"
     debug: bool = False
 
@@ -34,7 +34,18 @@ class DataBaseSettings(BaseSettings):
         return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
 
 
+class EmailSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="EMAIL_")
+
+    host: str
+    port: int = 587  # 587 for STARTTLS, 465 for SSL
+    user: str
+    password: str
+    sender: str
+
+
 _app_settings = AppSettings()
+
 
 set_debug_level(_app_settings.debug)
 set_appname(_app_settings.appname)
@@ -47,3 +58,7 @@ def get_appsettings():
 
 def get_database_settings():
     return DataBaseSettings()
+
+
+def get_email_settings():
+    return EmailSettings()
