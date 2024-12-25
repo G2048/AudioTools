@@ -66,6 +66,10 @@ class PromptsPage(Page):
     def __init__(self, prompts: OrderedDict):
         self.prompts = prompts
 
+    @property
+    def title(self) -> str:
+        return "Загрузка Промптов"
+
     def filter_prompts(self):
         self.prompts = OrderedDict(filter(lambda items: items[1][0] > 0, self.prompts.items()))
 

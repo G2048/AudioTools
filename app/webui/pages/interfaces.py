@@ -8,6 +8,11 @@ class Page(ABC):
     def get_app() -> gr.Blocks:
         pass
 
+    @property
+    @abstractmethod
+    def title(self) -> str:
+        pass
+
 
 class Action(ABC):
     @abstractmethod

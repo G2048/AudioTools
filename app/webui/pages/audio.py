@@ -26,6 +26,10 @@ class AudioPage(Page):
         self.email_sender = EmailSender(email_settings)
         self.theme = None
 
+    @property
+    def title(self) -> str:
+        return "Загрузка аудио"
+
     # Test emails:
     # go@yandex.ru;print; urea@gmai l.com, so@ydex.ru;print; urea@gmail.com
     def __filter_emails(self, emails: str) -> tuple:
