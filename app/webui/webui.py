@@ -15,7 +15,13 @@ class WebUI:
         for page in pages:
             list_apps.append(cls(page).app)
             list_titles.append(page.title)
-        apps = gr.TabbedInterface(list_apps, list_titles)
+
+        apps = gr.TabbedInterface(
+            list_apps,
+            list_titles,
+            title="WebUI",
+            css="footer {visibility: hidden}",
+        )
         return gr.mount_gradio_app(app, apps, path=path)
 
     def run(self):
