@@ -68,6 +68,7 @@ class EmailSender:
 
     def send(self, email: Email):
         email.create_message(self.sender)
+        logger.info(f"Sending email: {email}")
         self._recive(email)
 
     def send_batch(self, emails: Sequence[Email]):
