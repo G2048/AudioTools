@@ -1,9 +1,8 @@
 import time
-import gradio as gr
-
 from collections import OrderedDict
 from dataclasses import dataclass
 
+import gradio as gr
 from fastapi import FastAPI
 
 PROMPTS = OrderedDict(
