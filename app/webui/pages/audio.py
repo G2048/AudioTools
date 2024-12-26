@@ -117,46 +117,4 @@ class AudioPage(Page):
             #     inputs=audio_input, outputs=text_output, fn=lambda x: f"Audio changed to {x}"
             # )
 
-            # Only for testing
-            # with gr.Row(equal_height=True, variant="panel"):
-            #     with gr.Column(scale=1):
-            #         speed = gr.Slider(
-            #             minimum=0.1,
-            #             maximum=10,
-            #             value=1,
-            #             step=0.1,
-            #             interactive=True,
-            #             label="Скорость загрузки",
-            #         )
-            #         result = gr.Textbox(
-            #             lines=1,
-            #             interactive=False,
-            #             label="Результат:",
-            #             show_copy_button=True,
-            #         )
-            #     gr.Markdown("Пример результата:")
-            #     gr.Markdown("Время выполнения: 0:00:00.00")
-            #     gr.Markdown("Процент правильных распознований: 0.00%")
-            #     gr.Markdown("Количество потраченных токенов: 0.00")
-
-            #     result_prompts = [
-            #         gr.Textbox(
-            #             lines=1,
-            #             interactive=False,
-            #             label="Время выполнения:",
-            #             show_copy_button=True,
-            #         ),
-            #         gr.Textbox(
-            #             lines=1,
-            #             interactive=False,
-            #             label="Процент правильных распознований:",
-            #             show_copy_button=True,
-            #         ),
-            #         gr.Textbox(
-            #             lines=1,
-            #             interactive=False,
-            #             label="Количество потраченных токенов:",
-            #             show_copy_button=True,
-            #         ),
-            #     ]
         return app
