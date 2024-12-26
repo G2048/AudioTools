@@ -1,4 +1,8 @@
+import logging
+
 from .base import S3Client
+
+logger = logging.getLogger("stdout")
 
 
 class S3Bucket:
