@@ -13,20 +13,11 @@ class S3Bucket:
     def create_bucket(self):
         self.s3_client.create_bucket(Bucket=self.bucket_name)
 
-    # object_name is file
-    def _get_object(self, object_name: str):
+    def get_object(self, object_name: str) -> dict:
         return self.s3_client.get_object(Bucket=self.bucket_name, Key=object_name)
 
-    def get_object(self, object_name: str):
-        get_object_response = self._get_object(object_name)
-        logger.debug(f"{get_object_response=}")
-        return get_object_response["Body"].read()
-
-    def _list_objects(self):
-        return self.s3_client.list_objects(Bucket=self.bucket_name)
-
     def list_objects(self) -> list:
-        return self._list_objects()["Contents"]
+        return self.s3_client.list_objects(Bucket=self.bucket_name)
 
     def upload_file(self, file_path: str, object_name: str):
         # s3.upload_file("this_script.py", "bucket-name", "script/py_script.py")
@@ -35,4 +26,4 @@ class S3Bucket:
     # Remove objects from bucket
     def delete_objects(self, object_names: list[dict]):
         # object_names = [{"Key": "object_name"}, {"Key": "script/py_script.py"}]
-        response = self.s3_client.delete_objects(Bucket=self.bucket_name, Delete={"Objects": object_names})
+        return self.s3_client.delete_objects(Bucket=self.bucket_name, Delete={"Objects": object_names})
