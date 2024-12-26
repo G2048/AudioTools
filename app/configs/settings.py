@@ -46,8 +46,9 @@ class EmailSettings(BaseSettings):
 class AwsSettingsConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="AWS_")
 
-    access_key_id: str
-    secret_access_key: str
+    endpoint_url: str
+    aws_access_key_id: str
+    aws_secret_access_key: str
     bucket_name: str
     object_path: str
     directory_path: str
