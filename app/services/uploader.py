@@ -21,8 +21,8 @@ class AwsUploader:
         path.mkdir(parents=True, exist_ok=True)
         return path
 
-    def upload_file(self, file_name: str):
-        file_path = f"tests/{file_name}"
+    def upload_file(self, file_name: str, path: str = "."):
+        file_path = str(Path(path) / file_name)
         object_path = str(self.path / file_name)
         self.s3_bucket.upload_file(file_path, object_path)
         logger.info(f"File {file_name} uploaded")

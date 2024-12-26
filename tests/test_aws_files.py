@@ -57,7 +57,7 @@ class TestCaseAws(unittest.TestCase):
                 print(f"{file_name=}")
 
     def test_upload_file(self):
-        client.upload_file(TEST_FILE)
+        client.upload_file(TEST_FILE, "tests")
         file_dump = client.get_file(TEST_FILE)
         self.assertIsNotNone(file_dump)
 
