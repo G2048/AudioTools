@@ -14,7 +14,7 @@ assert TEST_FILE, "TEST_FILE env variable is not set"
 
 class TestCaseAws(unittest.TestCase):
     def setUp(self):
-        pass
+        self.file = client.create_file(TEST_FILE)
 
     def tearDown(self):
         pass
@@ -39,32 +39,32 @@ class TestCaseAws(unittest.TestCase):
         print(f"{files_name=}")
 
     def test_get_file(self):
-        file_info = client.get_file(TEST_FILE)
+        file_info = client.get(self.file)
         self.assertIsNotNone(file_info)
         self.assertIsInstance(file_info, bytes)
 
     def test_save_file(self):
-        client.save_file(TEST_FILE)
+        client.save(self.file)
 
     def test_get_files(self):
         files = client.list_files()
         files_name = [file["Key"] for file in files]
 
         for file_name in files_name:
-            file_info = client.get_file(file_name)
+            file_info = client.get(file_name)
             self.assertIsNotNone(file_info)
             if file_info:
                 print(f"{file_name=}")
 
     def test_upload_file(self):
-        client.upload_file(TEST_FILE, "tests")
-        file_dump = client.get_file(TEST_FILE)
+        client.upload(self.file, "tests")
+        file_dump = client.get(self.file)
         self.assertIsNotNone(file_dump)
 
     def test_delete_file(self):
-        client.delete_file(TEST_FILE)
+        client.delete(self.file)
         try:
-            file_info = client.get_file(TEST_FILE)
+            file_info = client.get(self.file)
             self.fail("File should be deleted")
         except Exception:
             pass
