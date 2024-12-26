@@ -3,7 +3,7 @@ from .base import S3Client
 
 class S3Bucket:
     def __init__(self, client: S3Client, bucket_name: str):
-        self.s3_client = client
+        self.s3_client = client.s3_client
         self.bucket_name = bucket_name
 
     def create_bucket(self):
