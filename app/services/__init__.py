@@ -1,4 +1,2 @@
-from .audio import AudioUploader
+from .audio import AudioRecognizer, AudioUploader
 from .emails import Email, EmailSender
-
-__all__ = ["AudioUploader", "EmailSender", "Email"]

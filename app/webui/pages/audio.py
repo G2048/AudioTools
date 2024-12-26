@@ -5,7 +5,7 @@ import gradio as gr
 import numpy as np
 
 from app.configs.settings import get_email_settings
-from app.services import AudioUploader, Email, EmailSender
+from app.services import AudioRecognizer, AudioUploader, Email, EmailSender
 
 from .interfaces import Page
 
@@ -17,11 +17,17 @@ logger.debug(f"Email settings: {email_settings}")
 class AudioPage(Page):
     re_email = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
     email_message = """Здравствуйте!
-    \nВы получили аудио запрос на отправку в моей группе.
+    \nВы получили аудио запрос на расшифровку в моей группе.
+    \nЕсли вы получили это сообщение по ошибке, то сообщите мне по email или в чате.
+    """
+    email_message_transcribe = """Здравствуйте!
+    \nВаша расшифровка аудио запроса:
+    \n%s
     \nЕсли вы получили это сообщение по ошибке, то сообщите мне по email или в чате.
     """
 
     def __init__(self):
+        self.audo_recoginition = AudioRecognizer()
         self.audio_uploader = AudioUploader()
         self.email_sender = EmailSender(email_settings)
         self.theme = None
@@ -35,11 +41,11 @@ class AudioPage(Page):
     def __filter_emails(self, emails: str) -> tuple:
         return tuple(filter(self.re_email.findall, emails.split(";")))
 
-    def _send_email(self, emails: tuple[str]):
+    def _send_email(self, emails: tuple[str], text: str):
         gr.Info(f"Отправлено уведомление для {emails} пользователей")
         logger.info(f"Sending emails to {emails}")
 
-        g_emails = (Email(email, self.email_message) for email in emails)
+        g_emails = (Email(email, text) for email in emails)
         self.email_sender.execute(g_emails)
         return emails
 
@@ -55,8 +61,17 @@ class AudioPage(Page):
                 "Пожалуйста, укажите хотя бы один email.\n Используйте ';' как разделитель для email'ов"
             )
 
-        self._send_email(emails)
-        self._upload_file(audio, checkbox_speed)
+        self._send_email(emails, self.email_message)
+        text_audio = self._recoginition_audio(audio, checkbox_speed)
+        if not text_audio:
+            raise ValueError("Не удалось расшифровать аудио")
+        # self._upload_file(audio, checkbox_speed)
+        self._send_email(emails, self.email_message_transcribe % text_audio)
+
+    def _recoginition_audio(self, audio: np.ndarray, speed: bool) -> str:
+        logger.info(f"Speed: {speed}")
+        gr.Info(f"Расшифровка {audio} файла")
+        return self.audo_recoginition.execute(audio)
 
     def _upload_file(self, audio: np.ndarray, speed: bool):
         logger.info(f"Speed: {speed}")
@@ -74,7 +89,7 @@ class AudioPage(Page):
         ) as app:
             gr.Markdown("# Upload audio")
 
-            gr.Markdown("### Укажите email'ы для отправки уведомления загрузки аудио")
+            gr.Markdown("### Укажите email'ы для отправки расшифрованного аудио")
             with gr.Row(equal_height=True, variant="panel"):
                 with gr.Column(scale=1):
                     text_emails = gr.Textbox(
