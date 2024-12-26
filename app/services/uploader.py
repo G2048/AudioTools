@@ -1,15 +1,15 @@
 import logging
 
 from app.aws import S3Bucket, S3Client
-from app.configs.settings import AwsSettingsConfig
+from app.configs.settings import AwsBucketSettingsConfig, AwsSettingsConfig
 
 logger = logging.getLogger("stdout")
 
 
 class AwsUploader:
-    def __init__(self, settings: AwsSettingsConfig):
-        self.s3_client = S3Client(**settings.model_dump())
-        self.s3_bucket = S3Bucket(self.s3_client, settings.bucket_name)
+    def __init__(self, aws_settings: AwsSettingsConfig, bucket_settings: AwsBucketSettingsConfig):
+        self.s3_client = S3Client(**aws_settings.model_dump())
+        self.s3_bucket = S3Bucket(self.s3_client, bucket_settings.bucket_name)
         # self.s3_bucket.create_bucket()
 
     def upload_file(self, file_path: str, object_name: str):
