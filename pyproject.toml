@@ -11,6 +11,8 @@ gradio = "^5.9.0"
 fastapi = "^0.115.6"
 uvicorn = "^0.34.0"
 pydantic-settings = "^2.7.0"
+transformers = "^4.47.1"
+torch = "^2.5.1"
 
 
 [build-system]
