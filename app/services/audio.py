@@ -1,8 +1,10 @@
 import logging
+import os
 
-# import ffmpy
 import numpy as np
+import pydub
 from ffmpy import FFmpeg
+from gradio import processing_utils
 from transformers import Pipeline, pipeline
 
 from app.configs import get_aws_bucket_settings, get_aws_settings
@@ -31,30 +33,37 @@ class AudioUploader:
         self.uploader.upload(file, current_path)
 
 
-class AudioFiles:
-    list_audio = {}
-    __slot__ = ("list_audio", "file")
+class AudioFile:
+    __slot__ = ("list_audio", "name", "path", "output_path")
 
-    def __init__(self, file: str):
-        self.file = file.split(".")[0]
+    def __init__(self, file_path: str, output_path: str = "."):
+        # name without extension
+        self.path = file_path
+        self.name = os.path.basename(file_path).split(".")[0]
+        self.list_audio = {}
+        self.output_path = output_path
 
-    def convert_from_numpy(self, audio: np.ndarray):
+    @classmethod
+    def create_from_numpy(cls, audio: np.ndarray):
         return
 
     def create(self, format: str) -> dict:
-        formated_file = f"{self.file}.{format}"
-        self.list_audio.update({formated_file: None})
+        self.list_audio.update({self.new_path(format): None})
         return self.list_audio
 
-    @classmethod
-    def clean(cls):
-        cls.list_audio.clear()
+    def new_path(self, format: str):
+        return os.path.join(self.output_path, f"{self.name}.{format}")
+
+    # @classmethod
+    def clean(self):
+        self.list_audio.clear()
 
 
 class AudioConverter:
-    def __init__(self, name: str, output_file: AudioFiles):
-        self.file = output_file
-        self.name = name
+    def __init__(self, file: AudioFile):
+        self.file = file
+        # self.file = output_file
+        # self.file_path = file_path
 
     def convert_mp3(self):
         self.convert()
@@ -67,21 +76,30 @@ class AudioConverter:
 
     # TODO: add capture of stderr !
     def convert(self, format="mp3"):
-        logger.info(f"Converting {self.file} to {format}")
-        ff = FFmpeg(inputs={self.name: None}, outputs=self.file.create(format))
+        logger.info(f"Converting {self.file.name} to {format}")
+        ff = FFmpeg(inputs={self.file.path: None}, outputs=self.file.create(format))
 
         logger.debug(f"String for execution: {ff.cmd}")
         try:
             ff.run()
             logger.error(f"Error while converting {self.file} to {format}")
-        except Exception:
+        except Exception as e:
+            logger.error(e)
+            logger.error(f"Error while converting {self.file_path} to {format}")
             logger.error(f"String for execution: {ff.cmd}")
 
-    def to_format(self, audio: np.ndarray):
-        return audio.convert_from_numpy(audio)
+    @staticmethod
+    def to_numpy(file: str, format: str) -> np.ndarray:
+        return processing_utils.audio_from_file(file)[1]
 
-    # def _to_format(self, audio: np.ndarray):
-    #     return {f"{self.file}.{self.format}": None}
+    @staticmethod
+    def _to_format(audio: np.ndarray):
+        # pydub.AudioSegment.from_mp3()
+        segment = pydub.AudioSegment.from_file(file, format)
+        np_array = np.array(segment.get_array_of_samples())
+        if segment.channels > 1:
+            np_array = np.mean(np_array, axis=1)
+        return segment.frame_rate, np_array
 
 
 class AudioRecognizer:

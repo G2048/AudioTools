@@ -22,7 +22,9 @@ class S3File(File):
 
     def upload(self, path: str = ".") -> Self:
         file_path = str(Path(path) / self.file_name)
-        object_path = str(self.path / self.file_name)
+        object_path = str(self.path / self.file_name.split("/")[-1])
+        logger.info(f"Uploading {file_path} to {object_path}")
+
         self.s3_bucket.upload_file(file_path, object_path)
         logger.info(f"File {self.file_name} uploaded")
         return self

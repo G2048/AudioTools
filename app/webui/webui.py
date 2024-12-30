@@ -19,7 +19,7 @@ class WebUI:
         apps = gr.TabbedInterface(
             list_apps,
             list_titles,
-            title="WebUI",
+            title="Audio Diffusion",
             css="footer {visibility: hidden}",
         )
         return gr.mount_gradio_app(app, apps, path=path)
