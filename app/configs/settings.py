@@ -43,6 +43,22 @@ class EmailSettings(BaseSettings):
     sender: str
 
 
+class AwsSettingsConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="AWS_")
+
+    endpoint_url: str
+    aws_access_key_id: str
+    aws_secret_access_key: str
+
+
+class AwsBucketSettingsConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="AWS_")
+
+    bucket_name: str
+    object_path: str
+    directory_path: str
+
+
 _app_settings = AppSettings()
 
 
@@ -61,3 +77,11 @@ def get_database_settings() -> DataBaseSettings:
 
 def get_email_settings() -> EmailSettings:
     return EmailSettings()
+
+
+def get_aws_settings() -> AwsSettingsConfig:
+    return AwsSettingsConfig()
+
+
+def get_aws_bucket_settings() -> AwsBucketSettingsConfig:
+    return AwsBucketSettingsConfig()
