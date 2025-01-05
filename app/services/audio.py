@@ -88,7 +88,7 @@ class AudioConverter:
             logger.error(f"Error while converting {self.file} to {format}")
         except Exception as e:
             logger.error(e)
-            logger.error(f"Error while converting {self.file_path} to {format}")
+            logger.error(f"Error while converting {self.file} to {format}")
             logger.error(f"String for execution: {ff.cmd}")
 
     @staticmethod

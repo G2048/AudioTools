@@ -46,6 +46,7 @@ class AudioConverterPage(Page):
             audio_path = self._convert_file(audio, format="mp3", output_path=self.FILE_TMP)
         if wav:
             audio_path = self._convert_file(audio, format="wav", output_path=self.FILE_TMP)
+        logger.info(f"Audio path: {audio_path}")
 
         # Post processing
         return (
