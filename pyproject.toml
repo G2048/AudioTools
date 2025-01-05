@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "webui"
+name = "Audio Tools"
 version = "0.1.0"
 description = ""
 authors = ["IX <borntokill.ix@gmail.com>"]
