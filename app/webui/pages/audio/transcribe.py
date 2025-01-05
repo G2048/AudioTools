@@ -105,7 +105,7 @@ class AudioTranscribePage(Page):
             title="Prompts",
             css="footer {visibility: hidden}",
         ) as app:
-            gr.Markdown("# Trasncribe audio")
+            gr.Markdown("# Transcribe audio")
 
             gr.Markdown("### Укажите email'ы для отправки расшифрованного аудио")
             with gr.Row(equal_height=True, variant="panel"):
