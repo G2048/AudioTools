@@ -48,27 +48,61 @@ class AudioConverterPage(Page):
             audio_path = self._convert_file(audio, format="wav", output_path=self.FILE_TMP)
 
         # Post processing
-        return datetime.now() - start
+        return (
+            datetime.now() - start,
+            gr.Button(
+                "Конвертация аудио",
+                size="lg",
+                variant="primary",
+                visible=False,
+            ),
+            gr.Button(
+                "Скачать аудио",
+                size="lg",
+                variant="primary",
+                visible=True,
+            ),
+            audio_path,
+        )
 
-    def _convert_file(self, audio_path: str, format: str = "mp3", output_path: str = "."):
+    @staticmethod
+    def _convert_file(audio_path: str, format: str = "mp3", output_path: str = "."):
         logger.info(f"Conver file to {format} format")
         gr.Info(f"Конвертация aудио в {format}...")
         # hash_audio_file = hashlib.md5(audio_path.encode("utf-8")).hexdigest() + ".mp3"
         # logger.info(f"New hashed audio file: {hash_audio_file}")
 
         audio_file = AudioFile(audio_path, output_path)
-        self.audio_converter = AudioConverter(file=audio_file)
-        self.audio_converter.convert(format=format)
+        audio_converter = AudioConverter(file=audio_file)
+        audio_converter.convert(format=format)
 
         gr.Info("Конвертация завершена!")
         return audio_file.new_path(format)
+
+    def _do_download(self, audio_path: str):
+        gr.Info("Скачивание аудио...")
+        return (
+            gr.Button(
+                "Конвертация аудио",
+                size="lg",
+                variant="primary",
+                visible=True,
+            ),
+            gr.DownloadButton(
+                "Скачать аудио",
+                value=audio_path,
+                # link=f"/file={audio_path}",
+                size="lg",
+                variant="primary",
+                visible=False,
+            ),
+        )
 
     # @staticmethod
     # def __check_box_creator(formats: list[str]):
     #     return [
     #         gr.Checkbox(label=format, info="Аудио будет преобразовано в %s" % format) for format in formats
     #     ]
-
     def get_app(self) -> gr.Blocks:
         with gr.Blocks(
             theme=self.theme,
@@ -106,11 +140,29 @@ class AudioConverterPage(Page):
                 size="lg",
                 variant="primary",
             )
-
+            download_button = gr.DownloadButton(
+                "Скачать аудио",
+                # link=None,
+                size="lg",
+                variant="primary",
+                visible=False,
+            )
+            audio_download = gr.Textbox(
+                lines=1,
+                interactive=False,
+                label="Ссылка на скачанноe аудио",
+                show_label=False,
+                visible=False,
+            )
             start_button.click(
                 fn=self.__do,
                 inputs=[audio_input, checkbox_mp3, checkbox_wav],
-                outputs=time_text,
+                outputs=[time_text, start_button, download_button, audio_download],
             )
-
+            download_button.click(
+                fn=self._do_download,
+                inputs=audio_download,
+                outputs=[start_button, download_button],
+            )
+        app.allowed_paths = ["/file", self.FILE_TMP]
         return app
