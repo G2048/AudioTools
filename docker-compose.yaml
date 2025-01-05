@@ -1,0 +1,13 @@
+services:
+  transcriber:
+    # image: sever-audio:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - .whisper:/whisper
+    env_file:
+      - .env
+    ports:
+      - 8000:8080
