@@ -77,7 +77,7 @@ class EmailSender:
         """
         g_emails = (email.create_message(self.sender) for email in emails)
         for email in g_emails:
-            logger.info(f"Sending email: {email}")
+            logger.debug(f"Sending email: {email}")
             self._recive(email)
 
     def execute(self, emails: Sequence[Email]):

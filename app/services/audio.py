@@ -16,6 +16,9 @@ logger = logging.getLogger("stdout")
 
 aws_settings = get_aws_settings()
 bucket_settings = get_aws_bucket_settings()
+# LLMMODEL = "./whisper-large-v3"
+LLMMODEL = os.environ.get("LLMMODEL")
+assert LLMMODEL, "Environment variable LLMMODEL is not set. Choose path to LLM model"
 
 
 class AudioUploader:
@@ -103,7 +106,7 @@ class AudioConverter:
 
 
 class AudioRecognizer:
-    transcriber: Pipeline = pipeline("automatic-speech-recognition", model="openai/whisper-base.en")
+    transcriber: Pipeline = pipeline("automatic-speech-recognition", max_new_tokens=445, model=LLMMODEL)
 
     def __init__(self):
         pass
@@ -123,6 +126,11 @@ class AudioRecognizer:
         return self.transcriber({"sampling_rate": sr, "raw": y}, return_timestamps=True)
 
     def execute(self, audio: np.ndarray) -> str:
-        transcribed = self.transcribe(audio)["text"]
+        transcribed = self.transcribe(audio)
         logger.debug(f"Transcribed: {transcribed}")
-        return transcribed
+        chunks: list[dict[str, str]] = transcribed["chunks"]
+        processing_text = ""
+        for chunk in chunks:
+            processing_text += f'{chunk["timestamp"][0]} - {chunk["timestamp"][1]}: {chunk["text"]}\n'
+
+        return processing_text
