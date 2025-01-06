@@ -30,6 +30,7 @@ This is a simple UI transcriber that uses Whisper to transcribe audio files.
 - [ ] Add Telegram bot integration
 - [ ] Create a single microservice for AI-transcription
 - [ ] Add Broker for Microservices
+- [ ] Add TTS
 
 ## Contributing
 
