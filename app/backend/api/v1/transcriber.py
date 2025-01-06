@@ -61,11 +61,10 @@ class AudioService:
         self.audo_recoginition = AudioRecognizer()
 
     def recoginition_audio(self, audio: np.ndarray) -> str:
-        logger.info("Trannscription audio file")
+        logger.info("Start Transcription audio file")
         return self.audo_recoginition.execute(audio)
 
     def checking_audio(self, audio: np.ndarray):
-        logger.info(f"Audio: {audio}")
         if not len(audio):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Audio not found")
 
