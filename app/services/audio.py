@@ -92,11 +92,11 @@ class AudioConverter:
             logger.error(f"String for execution: {ff.cmd}")
 
     @staticmethod
-    def to_numpy(file: str, format: str) -> np.ndarray:
+    def to_numpy(file: str) -> np.ndarray:
         return processing_utils.audio_from_file(file)[1]
 
     @staticmethod
-    def _to_format(audio: np.ndarray):
+    def to_format(audio: np.ndarray):
         # pydub.AudioSegment.from_mp3()
         segment = pydub.AudioSegment.from_file(file, format)
         np_array = np.array(segment.get_array_of_samples())
