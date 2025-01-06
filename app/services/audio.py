@@ -93,7 +93,7 @@ class AudioConverter:
 
     @staticmethod
     def to_numpy(file: str) -> np.ndarray:
-        return processing_utils.audio_from_file(file)[1]
+        return processing_utils.audio_from_file(file)
 
     @staticmethod
     def to_format(audio: np.ndarray):
