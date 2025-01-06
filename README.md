@@ -25,6 +25,12 @@ This is a simple UI transcriber that uses Whisper to transcribe audio files.
 3. Wait for the transcription to complete
 4. The transcription will be displayed in the UI
 
+## TODO List
+
+- [ ] Add Telegram bot integration
+- [ ] Create a single microservice for AI-transcription
+- [ ] Add Broker for Microservices
+
 ## Contributing
 
 Contributions are welcome! If you find a bug or have a suggestion, please open an issue or submit a pull request.
