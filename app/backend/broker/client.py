@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Callable, Optional, Self
+from typing import Callable, Coroutine, Optional, Self
 
 from nats.aio.client import Client
 from nats.aio.msg import Msg
@@ -73,9 +73,19 @@ class NatsConnection:
     async def terminate(self):
         await self.connect.drain()
 
+    @staticmethod
+    def run_async(coro: Coroutine):
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+        try:
+            loop.run_until_complete(coro)
+        except RuntimeError as e:
+            logger.exception(f"Error: {e}")
+
     def __enter__(self) -> Self:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.to_connect())
+        self.run_async(self.to_connect())
         return self
 
     def __exit__(self, exc_type, exc, tb):
@@ -84,9 +94,7 @@ class NatsConnection:
         except Exception:
             pass
         finally:
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.connect.close())
-            # loop.run_coroutine_threadsafe
+            self.run_async(self.connect.close())
 
     async def __aenter__(self) -> Self:
         await self.to_connect()

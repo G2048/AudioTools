@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import re
 from datetime import datetime
@@ -8,7 +7,6 @@ from fastapi import APIRouter, HTTPException, UploadFile, status
 from pydantic import BaseModel
 
 from app.backend.broker import NatsConnection, NatsPublisher
-from app.configs.settings import get_email_settings
 from app.services import AudioConverter, AudioRecognizer
 
 # from app.backend.api.v1.transcriber.models import Transcription
@@ -26,8 +24,6 @@ from app.services import AudioConverter, AudioRecognizer
 router = APIRouter(prefix="/v1/transcriber")
 
 logger = logging.getLogger("stdout")
-email_settings = get_email_settings()
-logger.debug(f"Email settings: {email_settings}")
 
 
 class Transcription(BaseModel):
@@ -75,19 +71,8 @@ async def send_emails_to_broker(public: str, message: BrokerEmailMessage):
     logger.info("Sending emails to broker")
     async with NatsConnection() as nats:
         publisher = NatsPublisher(public, nats.connect)
+        # nats.run_async(publisher.publish(message.model_dump_json().encode()))
         await publisher.publish(message.model_dump_json().encode())
-
-
-def run_async(coro):
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-    # asyncio.set_event_loop(loop)
-    try:
-        loop.run_until_complete(coro)
-    except Exception as e:
-        logger.exception(f"Error: {e}")
 
 
 PUBLIC = "emails"
@@ -115,8 +100,8 @@ def create_transcription(file: UploadFile, emails: list[str]):
         )
 
     message = BrokerEmailMessage(emails=emails, text_audio=text_audio)
-    run_async(send_emails_to_broker(PUBLIC, message))
-
+    NatsConnection.run_async(send_emails_to_broker(PUBLIC, message))
+    # send_emails_to_broker(PUBLIC, message)
     # Post processing
     execution_time = datetime.now() - start
     return Transcription(time_execution=execution_time.total_seconds())
