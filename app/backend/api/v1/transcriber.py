@@ -101,7 +101,6 @@ def create_transcription(file: UploadFile, emails: list[str]):
         )
 
     # Post processing
-    # I don't know whether uploading file to aws
     email_service.send_email(emails, text_audio)
     execution_time = datetime.now() - start
     return Transcription(time_execution=execution_time.total_seconds())
