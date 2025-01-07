@@ -73,6 +73,21 @@ class NatsConnection:
     async def terminate(self):
         await self.connect.drain()
 
+    def __enter__(self) -> Self:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.to_connect())
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        try:
+            pass
+        except Exception:
+            pass
+        finally:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.connect.close())
+            # loop.run_coroutine_threadsafe
+
     async def __aenter__(self) -> Self:
         await self.to_connect()
         return self
@@ -157,6 +172,31 @@ async def test_nats_context():
         await asyncio.gather(publisher(), subscriber())
 
 
+def test_nats_sync_context():
+    async def send_to_broker(public: str):
+        async with NatsConnection() as nats:
+
+            async def subscriber():
+                subscriber = NatsSabscriber("public_test", nats.connect)
+                await subscriber.subscribe()
+                await subscriber.unsubscribe(limit=20)
+
+            async def publisher():
+                publisher = NatsPublisher("public_test", nats.connect)
+                for i in range(10):
+                    await publisher.publish(f"Hello World {i}!".encode())
+
+            await asyncio.gather(publisher(), subscriber())
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        # asyncio.run(send_to_broker("public_test"))
+        asyncio.run_coroutine_threadsafe(send_to_broker("public_test"), loop=loop)
+    except KeyboardInterrupt:
+        pass
+
+
 async def test_nats_connection():
     nats = NatsConnection()
     nats_connect = await nats.to_connect()
@@ -177,6 +217,7 @@ async def test_nats_connection():
 
 
 if __name__ == "__main__":
-    asyncio.run(test_nats_client())
+    # asyncio.run(test_nats_client())
+    test_nats_sync_context()
     # asyncio.run(test_nats_connection())
     # asyncio.run(test_nats_context())
