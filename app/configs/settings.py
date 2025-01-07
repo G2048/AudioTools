@@ -19,6 +19,12 @@ class AppSettings(BaseSettings):
         return value.lower()
 
 
+class BrokerSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="BROKER_")
+
+    public: str
+
+
 class DataBaseSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="PG_")
 
@@ -32,15 +38,6 @@ class DataBaseSettings(BaseSettings):
     @computed_field(return_type=str)
     def pg_dsn(self):
         return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.dbname}"
-
-
-class EmailSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="EMAIL_")
-
-    host: str
-    port: int = 587  # 587 for STARTTLS, 465 for SSL
-    password: str
-    sender: str
 
 
 class AwsSettingsConfig(BaseSettings):
@@ -71,12 +68,12 @@ def get_appsettings() -> AppSettings:
     return _app_settings
 
 
+def get_broker_settings() -> BrokerSettings:
+    return BrokerSettings()
+
+
 def get_database_settings() -> DataBaseSettings:
     return DataBaseSettings()
-
-
-def get_email_settings() -> EmailSettings:
-    return EmailSettings()
 
 
 def get_aws_settings() -> AwsSettingsConfig:
