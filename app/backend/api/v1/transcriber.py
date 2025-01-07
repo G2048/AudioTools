@@ -1,6 +1,6 @@
 import logging
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import numpy as np
 from fastapi import APIRouter, HTTPException, UploadFile, status
@@ -33,7 +33,7 @@ class Transcription(BaseModel):
 
 
 class EmailService:
-    re_email = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+    re_email = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
     email_message_template = """Здравствуйте!
     \nВаша расшифровка аудио запроса:
     \n%s
@@ -49,9 +49,9 @@ class EmailService:
         self.email_sender.execute(g_emails)
         return emails
 
-    def filter_emails(self, raw_emails: str) -> tuple[str]:
-        logger.debug(f"Doing with {raw_emails}")
-        return tuple(filter(self.re_email.findall, raw_emails.split(";")))
+    def filter_emails(self, emails: str) -> list[str]:
+        logger.debug(f"Doing with {emails}")
+        return self.re_email.findall(emails)
 
 
 class AudioService:
@@ -80,18 +80,16 @@ audio_converter = AudioConverter
 
 
 @router.post("/", response_model=Transcription)
-# def create_transcription(file: Annotated[bytes, File()], raw_emails: str):
-def create_transcription(file: UploadFile, raw_emails: str):
+# def create_transcription(file: Annotated[bytes, File()], emails: str):
+def create_transcription(file: UploadFile, emails: list[str]):
     start = datetime.now()
-
-    # path_to_audio = request.files["audio"].file.path
 
     audio: np.ndarray = audio_converter.to_numpy(file.file)
     logger.info(f"Audio: {audio=}")
 
     audio_service.checking_audio(audio)
 
-    emails = email_service.filter_emails(raw_emails)
+    emails = email_service.filter_emails(" ".join(emails))
     if not emails:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Emails not found")
 
