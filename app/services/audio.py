@@ -7,33 +7,12 @@ from ffmpy import FFmpeg
 from gradio import processing_utils
 from transformers import Pipeline, pipeline
 
-from app.configs import get_aws_bucket_settings, get_aws_settings
-
-from .uploader import AwsUploader
-
 logger = logging.getLogger("stdout")
 
 
-aws_settings = get_aws_settings()
-bucket_settings = get_aws_bucket_settings()
 # LLMMODEL = "./whisper-large-v3"
 LLMMODEL = os.environ.get("LLMMODEL")
 assert LLMMODEL, "Environment variable LLMMODEL is not set. Choose path to LLM model"
-
-
-class AudioUploader:
-    __slot__ = "uploader"
-
-    def __init__(self):
-        self.uploader = AwsUploader(aws_settings, bucket_settings)
-
-    def execute(self, file_path: str):
-        logger.info(f"Uploading {file_path}")
-        # Узкое место: если в пути будет несколько директорий,
-        # то будет браться только первая - это плохо, но пока не понятно нужно ли большее
-        current_path = "." if not len(file_path.split("/")) > 1 else file_path.split("/")[0]
-        file = self.uploader.create_file(file_path)
-        self.uploader.upload(file, current_path)
 
 
 class AudioFile:
@@ -131,6 +110,6 @@ class AudioRecognizer:
         chunks: list[dict[str, str]] = transcribed["chunks"]
         processing_text = ""
         for chunk in chunks:
-            processing_text += f'{chunk["timestamp"][0]} - {chunk["timestamp"][1]}: {chunk["text"]}\n'
+            processing_text += f"{chunk['timestamp'][0]} - {chunk['timestamp'][1]}: {chunk['text']}\n"
 
         return processing_text
