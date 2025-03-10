@@ -3,9 +3,10 @@ import os
 
 import gradio as gr
 
+from app.adapters import AudioAwsUploader
 from app.configs.settings import get_email_settings
 from app.interfaces import Page
-from app.services import AudioConverter, AudioUploader
+from app.services import AudioConverter
 
 logger = logging.getLogger("stdout")
 email_settings = get_email_settings()
@@ -16,7 +17,8 @@ class AudioUploadPage(Page):
     AUDIO_LIMIT = 10**9
 
     def __init__(self):
-        self.audio_uploader = AudioUploader()
+        # TODO: change to interface!
+        self.audio_uploader = AudioAwsUploader()
         self.theme = None
 
     @property
