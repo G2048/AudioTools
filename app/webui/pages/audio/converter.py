@@ -4,9 +4,8 @@ from datetime import datetime
 
 import gradio as gr
 
+from app.interfaces import Page
 from app.services import AudioConverter, AudioFile, AudioRecognizer
-
-from ..interfaces import Page
 
 logger = logging.getLogger("stdout")
 

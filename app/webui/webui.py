@@ -1,7 +1,7 @@
 import gradio as gr
 from fastapi import FastAPI
 
-from .pages.interfaces import Page
+from app.interfaces import Page
 
 
 class WebUI:
