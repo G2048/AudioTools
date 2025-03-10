@@ -79,15 +79,15 @@ class AudioTranscribePage(Page):
         ) as app:
             gr.Markdown("# Transcribe audio")
 
-            gr.Markdown(f"### Укажите {self._sender.title}'ы для отправки расшифрованного аудио")
+            gr.Markdown(f"### Укажите {self._sender.type}'ы для отправки расшифрованного аудио")
             with gr.Row(equal_height=True, variant="panel"):
                 with gr.Column(scale=1):
                     text_title = gr.Textbox(
                         lines=1,
                         interactive=True,
                         show_copy_button=True,
-                        info=f"Используйте ';' как разделитель для {self._sender.title}'ов",
-                        label=f"Введитe cписок {self._sender.title}'ов:",
+                        info=f"Используйте ';' как разделитель для {self._sender.type}'ов",
+                        label=f"Введитe cписок {self._sender.type}'ов:",
                     )
             audio_input = gr.Audio(
                 interactive=True,

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class SenderInterface(ABC):
     @property
     @abstractmethod
-    def title(self) -> str:
+    def type(self) -> str:
         pass
 
     @abstractmethod

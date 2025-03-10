@@ -46,7 +46,7 @@ class EmailSenderAdapter(SenderInterface):
         return emails
 
     @property
-    def title(self) -> str:
+    def type(self) -> str:
         return "email"
 
     def check_input(self, recipients: str) -> tuple[str]:
