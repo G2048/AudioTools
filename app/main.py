@@ -1,9 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
 
-from app.adapters import AudioAwsUploader, EmailSenderAdapter
+from app.adapters import AudioAwsUploader, EmailSenderAdapter, LocalNeuralAudioRecognizer
 from app.configs import LogConfig, get_appsettings, get_email_settings, get_logger
-from app.services import AudioRecognizer
 from app.webui import AudioConverterPage, AudioTranscribePage, AudioUploadPage, WebUI
 
 logger = get_logger()
@@ -22,7 +21,7 @@ app = WebUI.pages(
         AudioUploadPage(),
         AudioTranscribePage(
             AudioAwsUploader(),
-            AudioRecognizer(),
+            LocalNeuralAudioRecognizer(),
             # AwsAudioUploader(),
             # SberSpeechRecognizer(),
             EmailSenderAdapter(email_settings),
