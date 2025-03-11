@@ -2,8 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from app.adapters import AudioAwsUploader, EmailSenderAdapter
-from app.configs import LogConfig, get_appsettings, get_logger
-from app.configs.settings import get_email_settings
+from app.configs import LogConfig, get_appsettings, get_email_settings, get_logger
 from app.services import AudioRecognizer
 from app.webui import AudioConverterPage, AudioTranscribePage, AudioUploadPage, WebUI
 
