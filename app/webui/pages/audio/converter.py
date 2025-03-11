@@ -5,7 +5,7 @@ from datetime import datetime
 import gradio as gr
 
 from app.interfaces import Page
-from app.services import AudioConverter, AudioFile, AudioRecognizer
+from app.services import AudioConverter, AudioFile
 
 logger = logging.getLogger("stdout")
 
@@ -21,7 +21,6 @@ class AudioConverterPage(Page):
     FILE_TMP = "/tmp"
 
     def __init__(self):
-        self.audo_recoginition = AudioRecognizer()
         self.theme = None
         self.audio_formats = [AudioFormats.MP3, AudioFormats.WAV]
 
