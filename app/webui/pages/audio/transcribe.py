@@ -5,10 +5,10 @@ import gradio as gr
 import numpy as np
 
 from app.interfaces import (
+    AudioRecognizerInterface,
     AudioUploaderInterface,
     Page,
     SenderInterface,
-    SpeechRecognizerInterface,
 )
 
 logger = logging.getLogger("stdout")
@@ -20,7 +20,7 @@ class AudioTranscribePage(Page):
     def __init__(
         self,
         uploader: AudioUploaderInterface,
-        recognizer: SpeechRecognizerInterface,
+        recognizer: AudioRecognizerInterface,
         sender: SenderInterface,
     ):
         self._audio_uploader = uploader
@@ -43,7 +43,7 @@ class AudioTranscribePage(Page):
     def _recoginition_audio(self, audio: np.ndarray, speed: bool) -> str:
         logger.info(f"Speed: {speed}")
         gr.Info("Расшифровка аудио файла")
-        return self._audo_recognizer.execute(audio)
+        return self._audo_recognizer.recognize(audio)
 
     def __do(self, audio: np.ndarray, raw_recipients: str, checkbox_speed: bool):
         # def __do(self, audio_path: str, raw_recipients: str, checkbox_speed: bool):
