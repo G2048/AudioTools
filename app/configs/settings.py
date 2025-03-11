@@ -59,6 +59,12 @@ class AwsBucketSettingsConfig(BaseSettings):
     directory_path: str
 
 
+class NeuralSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="LLMMODEL_")
+
+    name: str
+
+
 _app_settings = AppSettings()
 
 
@@ -85,3 +91,7 @@ def get_aws_settings() -> AwsSettingsConfig:
 
 def get_aws_bucket_settings() -> AwsBucketSettingsConfig:
     return AwsBucketSettingsConfig()
+
+
+def get_neural_settings() -> NeuralSettings:
+    return NeuralSettings()
