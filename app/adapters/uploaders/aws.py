@@ -16,7 +16,7 @@ class AudioAwsUploader(AudioUploaderInterface):
     def __init__(self):
         self.uploader = AwsUploader(aws_settings, bucket_settings)
 
-    def execute(self, file_path: str):
+    def upload(self, file_path: str):
         logger.info(f"Uploading {file_path}")
         # Узкое место: если в пути будет несколько директорий,
         # то будет браться только первая - это плохо, но пока не понятно нужно ли большее

@@ -32,11 +32,11 @@ RecognizedText: TypeAlias = _RecognizedText[key, text]
 
 class AudioUploaderInterface(ABC):
     @abstractmethod
-    def execute(self, file_path: str):
+    def upload(self, file_path: str):
         pass
 
 
 class SpeechRecognizerInterface(ABC):
     @abstractmethod
-    def execute(self, audio_file: str, channels_count: int) -> RecognizedText:
+    def recognize(self, audio_file: str, channels_count: int) -> RecognizedText:
         pass
