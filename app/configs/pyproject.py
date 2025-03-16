@@ -13,6 +13,7 @@ class _ParserPyproject:
 
 
 class ParserPyproject:
+    __slots__ = ()
     _parser = _ParserPyproject()
     name = _parser.name
     version = _parser.version

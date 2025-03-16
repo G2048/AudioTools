@@ -51,17 +51,20 @@ class JSONFormatter(logging.Formatter):
     COUNTER = 0
 
     def formatMessage(self, record) -> str:
+        global _appname
+        global _version
         ready_message: dict = {}
         values = record.__dict__
 
         self.COUNTER += 1
         logger_name: str = values["name"]
-        ready_message["app.name"] = "appname".lower()
-        ready_message["app.version"] = "1.0.0"
+        ready_message["app.name"] = _appname
+        ready_message["app.version"] = _version
         ready_message["app.logger"] = logger_name
         ready_message["time"] = self.formatTime(record, self.datefmt)
         ready_message["level"] = values.get("levelname")
         ready_message["log_id"]: int = self.COUNTER
+        ready_message["message"] = str(values["message"])
 
         if record.exc_info:
             ready_message["exc_text"] = self.formatException(record.exc_info)
@@ -87,7 +90,6 @@ class RouterFilter(logging.Filter):
     endpoints = ("/metrics", "/health")
 
     def filter(self, record) -> bool:
-        assert type(record.args) is tuple
         return not (len(record.args) > 2 and record.args[2] in self.endpoints)
 
 
@@ -186,6 +188,8 @@ def get_logger(name="stdout"):
 
 
 def set_appname(name: str):
+    global _appname
+    _appname = name
     LogConfig["handlers"]["rotate"]["filename"] = f"{name}.log"
 
 
