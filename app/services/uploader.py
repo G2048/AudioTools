@@ -4,17 +4,15 @@ from typing import Any, Self, Sequence
 
 from app.aws import S3Bucket, S3Client
 from app.configs.settings import AwsBucketSettingsConfig, AwsSettingsConfig
-
-from .interfaces import File, Uploader
-
-logger = logging.getLogger("stdout")
+from app.interfaces import FileInterface, UploaderInterface
 
 
-class S3File(File):
+class S3File(FileInterface):
     def __init__(self, s3bucket: S3Bucket, file: str, file_path: str = "."):
         self.s3_bucket = s3bucket
         self.file_name = file
         self.path = self._create_path_file(file_path)
+        self._logger = logging.getLogger("stdout")
 
     @property
     def name(self) -> str:
@@ -23,10 +21,10 @@ class S3File(File):
     def upload(self, path: str = ".") -> Self:
         file_path = str(Path(path) / self.file_name)
         object_path = str(self.path / self.file_name.split("/")[-1])
-        logger.info(f"Uploading {file_path} to {object_path}")
+        self._logger.info(f"Uploading {file_path} to {object_path}")
 
         self.s3_bucket.upload_file(file_path, object_path)
-        logger.info(f"File {self.file_name} uploaded")
+        self._logger.info(f"File {self.file_name} uploaded")
         return self
 
     def save(self) -> Self:
@@ -44,15 +42,15 @@ class S3File(File):
     def delete(self):
         object_path = str(self.path / self.file_name)
         response = self.s3_bucket.delete_objects([{"Key": object_path}])
-        logger.debug(f"{response=}")
+        self._logger.debug(f"{response=}")
         assert response["Deleted"][0]["Key"] == object_path
-        logger.info(f"File {self.file_name} deleted")
+        self._logger.info(f"File {self.file_name} deleted")
 
     def list_files(self) -> list[dict[Any, Any]]:
         return self.s3_bucket.list_objects()["Contents"]
 
 
-class AwsUploader(Uploader):
+class AwsUploader(UploaderInterface):
     def __init__(self, aws_settings: AwsSettingsConfig, bucket_settings: AwsBucketSettingsConfig):
         s3_client = S3Client(**aws_settings.model_dump())
         self.s3_bucket = S3Bucket(s3_client, bucket_settings.bucket_name)

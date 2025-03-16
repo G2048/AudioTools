@@ -4,9 +4,8 @@ from datetime import datetime
 
 import gradio as gr
 
-from app.services import AudioConverter, AudioFile, AudioRecognizer
-
-from ..interfaces import Page
+from app.interfaces import Page
+from app.services import AudioConverter, AudioFile
 
 logger = logging.getLogger("stdout")
 
@@ -20,11 +19,10 @@ class AudioFormats:
 class AudioConverterPage(Page):
     AUDIO_LIMIT = 10**9
     FILE_TMP = "/tmp"
+    audio_formats = list(filter(lambda x: not x.startswith("_"), dir(AudioFormats)))
 
     def __init__(self):
-        self.audo_recoginition = AudioRecognizer()
         self.theme = None
-        self.audio_formats = [AudioFormats.MP3, AudioFormats.WAV]
 
     @property
     def title(self) -> str:
@@ -42,10 +40,12 @@ class AudioConverterPage(Page):
         start = datetime.now()
         # Pre-processing
         self._checking_audio(audio)
-        if mp3:
-            audio_path = self._convert_file(audio, format="mp3", output_path=self.FILE_TMP)
+
+        format = "mp3"
         if wav:
-            audio_path = self._convert_file(audio, format="wav", output_path=self.FILE_TMP)
+            format = "wav"
+        audio_path = self._convert_file(audio, format=format, output_path=self.FILE_TMP)
+
         logger.info(f"Audio path: {audio_path}")
 
         # Post processing
@@ -67,7 +67,7 @@ class AudioConverterPage(Page):
         )
 
     @staticmethod
-    def _convert_file(audio_path: str, format: str = "mp3", output_path: str = "."):
+    def _convert_file(audio_path: str, format: str = "mp3", output_path: str = ".") -> str:
         logger.info(f"Conver file to {format} format")
         gr.Info(f"Конвертация aудио в {format}...")
         # hash_audio_file = hashlib.md5(audio_path.encode("utf-8")).hexdigest() + ".mp3"

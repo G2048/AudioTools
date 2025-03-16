@@ -1,5 +1,7 @@
 import json
 import logging.config
+import logging.handlers
+import queue
 import re
 
 """
@@ -46,22 +48,32 @@ def set_appversion(version: str):
     _version = version
 
 
+class AutoStartQueueListener(logging.handlers.QueueListener):
+    def __init__(self, queue, *handlers, respect_handler_level=False):
+        super().__init__(queue, *handlers, respect_handler_level=respect_handler_level)
+        # Start the listener immediately.
+        self.start()
+
+
 class JSONFormatter(logging.Formatter):
     _pattern = re.compile(r"%\((\w+)\)s")
     COUNTER = 0
 
     def formatMessage(self, record) -> str:
+        global _appname
+        global _version
         ready_message: dict = {}
         values = record.__dict__
 
         self.COUNTER += 1
         logger_name: str = values["name"]
-        ready_message["app.name"] = "appname".lower()
-        ready_message["app.version"] = "1.0.0"
+        ready_message["app.name"] = _appname
+        ready_message["app.version"] = _version
         ready_message["app.logger"] = logger_name
         ready_message["time"] = self.formatTime(record, self.datefmt)
         ready_message["level"] = values.get("levelname")
         ready_message["log_id"]: int = self.COUNTER
+        ready_message["message"] = str(values["message"])
 
         if record.exc_info:
             ready_message["exc_text"] = self.formatException(record.exc_info)
@@ -72,7 +84,7 @@ class JSONFormatter(logging.Formatter):
             value = values.get(value_name)
             ready_message.update({value_name: value})
 
-        if logger_name.startswith("uvicorn") and len(record.args) == 5:
+        if logger_name.startswith("uvicorn") and record.args and len(record.args) == 5:
             ready_message.pop("message", None)
             ready_message["client_addr"] = record.args[0]
             ready_message["method"] = record.args[1]
@@ -87,8 +99,7 @@ class RouterFilter(logging.Filter):
     endpoints = ("/metrics", "/health")
 
     def filter(self, record) -> bool:
-        assert type(record.args) is tuple
-        return not (len(record.args) > 2 and record.args[2] in self.endpoints)
+        return record.args is None or (not len(record.args) > 2 and record.args[2] in self.endpoints)
 
 
 LogConfig = {
@@ -136,6 +147,16 @@ LogConfig = {
             "formatter": "json",
             "filters": ["router"],
         },
+        "jsonq": {
+            "class": "logging.handlers.QueueHandler",
+            "queue": {
+                "()": queue.Queue,
+                "maxsize": -1,
+            },
+            "level": "DEBUG",
+            "listener": AutoStartQueueListener,
+            "handlers": ["json"],
+        },
     },
     "loggers": {
         "root": {
@@ -143,36 +164,36 @@ LogConfig = {
         },
         "stdout": {
             "level": LOG_LEVEL,
-            "handlers": ["json"],
+            "handlers": ["jsonq"],
             "propagate": False,
         },
         "asyncio": {
             "level": LOG_LEVEL,
-            "handlers": ["json"],
+            "handlers": ["jsonq"],
             "propagate": False,
         },
         "sqlalchemy.engine": {
             "level": SQL_LEVEL,
-            "handlers": ["json"],
+            "handlers": ["jsonq"],
             "propagate": False,
         },
         "sqlalchemy.pool": {
             "level": SQL_LEVEL,
-            "handlers": ["json"],
+            "handlers": ["jsonq"],
             "propagate": False,
         },
         "uvicorn": {
-            "handlers": ["json"],
+            "handlers": ["jsonq"],
             "level": LOG_LEVEL,
             "propagate": False,
         },
         "uvicorn.error": {
-            "handlers": ["json"],
+            "handlers": ["jsonq"],
             "level": LOG_LEVEL,
             "propagate": False,
         },
         "uvicorn.access": {
-            "handlers": ["json"],
+            "handlers": ["jsonq"],
             "level": LOG_LEVEL,
             "propagate": False,
         },
@@ -186,6 +207,8 @@ def get_logger(name="stdout"):
 
 
 def set_appname(name: str):
+    global _appname
+    _appname = name
     LogConfig["handlers"]["rotate"]["filename"] = f"{name}.log"
 
 

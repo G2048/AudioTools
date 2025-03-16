@@ -2,12 +2,11 @@ import logging
 import os
 
 import gradio as gr
-import numpy as np
 
+from app.adapters import AudioAwsUploader
 from app.configs.settings import get_email_settings
-from app.services import AudioConverter, AudioRecognizer, AudioUploader, EmailSender
-
-from ..interfaces import Page
+from app.interfaces import Page
+from app.services import AudioConverter
 
 logger = logging.getLogger("stdout")
 email_settings = get_email_settings()
@@ -18,9 +17,8 @@ class AudioUploadPage(Page):
     AUDIO_LIMIT = 10**9
 
     def __init__(self):
-        self.audo_recoginition = AudioRecognizer()
-        self.audio_uploader = AudioUploader()
-        self.email_sender = EmailSender(email_settings)
+        # TODO: change to interface!
+        self.audio_uploader = AudioAwsUploader()
         self.theme = None
 
     @property
@@ -34,11 +32,6 @@ class AudioUploadPage(Page):
 
         if os.path.getsize(audio_path) >= self.AUDIO_LIMIT:
             raise ValueError("Файл слишком большой!\n Максимальный размер 1 ГБ")
-
-    def _recoginition_audio(self, audio: np.ndarray, speed: bool) -> str:
-        logger.info(f"Speed: {speed}")
-        gr.Info(f"Расшифровка {audio} файла")
-        return self.audo_recoginition.execute(audio)
 
     def _conver_file(self, audio_path: str):
         logger.info("Conver file to mp3 format")

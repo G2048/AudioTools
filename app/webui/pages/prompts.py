@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 import gradio as gr
 
-from .interfaces import Page
+from app.interfaces import Page
 
 PROMPTS = OrderedDict(
     {

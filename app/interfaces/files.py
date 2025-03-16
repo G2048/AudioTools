@@ -6,7 +6,7 @@ from typing import Self
 logger = logging.getLogger("stdout")
 
 
-class File(ABC):
+class FileInterface(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
@@ -34,17 +34,17 @@ class File(ABC):
         return path
 
 
-class Uploader(ABC):
-    def upload(self, file: File, path: str = "."):
+class UploaderInterface(ABC):
+    def upload(self, file: FileInterface, path: str = "."):
         file.upload(path)
         logger.info(f"File {file.name} uploaded")
 
-    def save(self, file: File):
+    def save(self, file: FileInterface):
         file.save()
         logger.info(f"File {file.name} saved")
 
-    def get(self, file: File) -> bytes:
+    def get(self, file: FileInterface) -> bytes:
         return file.get()
 
-    def delete(self, file: File):
+    def delete(self, file: FileInterface):
         file.delete()
