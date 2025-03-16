@@ -26,7 +26,7 @@ class AudioFile:
         self.list_audio.update({self.new_path(format): None})
         return self.list_audio
 
-    def new_path(self, format: str):
+    def new_path(self, format: str) -> str:
         return os.path.join(self.output_path, f"{self.name}.{format}")
 
     # @classmethod
