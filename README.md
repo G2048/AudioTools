@@ -31,6 +31,8 @@ This is a simple UI transcriber that uses Whisper to transcribe audio files.
 - [ ] Create a single microservice for AI-transcription
 - [ ] Add Broker for Microservices
 - [ ] Add TTS
+- [ ] Add the Whisper Transcriber Microservice
+- [ ] Add Sender Telegram microservice
 
 ## Contributing
 
