@@ -11,7 +11,13 @@ email_settings = get_email_settings()
 
 logger.debug(f"Email settings: {email_settings}")
 
-app = FastAPI()
+app = FastAPI(
+    title=settings.appname.capitalize(),
+    description=settings.appname,
+    version=settings.appversion,
+    debug=settings.debug,
+    swagger_ui_parameters={"syntaxHighlight": {"theme": "obsidian"}},
+)
 
 # app = WebUI(AudioPage()).mount(app)
 app = WebUI.pages(
