@@ -1,7 +1,7 @@
 from typing import Optional
 
 from dotenv import load_dotenv
-from pydantic import computed_field, field_validator
+from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .log_settings import set_appname, set_appversion, set_debug_level
@@ -16,9 +16,9 @@ class AppSettings(BaseSettings):
     appversion: str = ParserPyproject.version
     debug: bool = False
 
-    @field_validator("appname")
-    def appname_is_lower(cls, value: str) -> str:
-        return value.lower()
+    @computed_field(return_type=str)
+    def appname_log(self) -> str:
+        return self.appname.lower().replace(" ", "_")
 
 
 class DataBaseSettings(BaseSettings):
@@ -71,11 +71,11 @@ _app_settings = AppSettings()
 
 
 set_debug_level(_app_settings.debug)
-set_appname(_app_settings.appname)
+set_appname(_app_settings.appname_log)
 set_appversion(_app_settings.appversion)
 
 
-def get_appsettings() -> AppSettings:
+def get_app_settings() -> AppSettings:
     return _app_settings
 
 

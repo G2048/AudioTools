@@ -22,6 +22,7 @@ class ParserPyproject:
 def test_parser_pyproject():
     parser = _ParserPyproject()
     assert parser.version == "0.1.0"
+    assert parser.name == "Audio Tools"
     assert isinstance(parser._tool, dict)
     print(f"{parser._tool=}")
 
