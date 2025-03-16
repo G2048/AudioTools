@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 
 from app.adapters import AudioAwsUploader, EmailSenderAdapter, LocalNeuralAudioRecognizer
 from app.configs import LogConfig, get_app_settings, get_email_settings, get_logger
@@ -18,6 +18,12 @@ app = FastAPI(
     debug=settings.debug,
     swagger_ui_parameters={"syntaxHighlight": {"theme": "obsidian"}},
 )
+
+
+@app.get("/health", status_code=status.HTTP_200_OK)
+def health():
+    return {"status": "ok"}
+
 
 # app = WebUI(AudioPage()).mount(app)
 app = WebUI.pages(
