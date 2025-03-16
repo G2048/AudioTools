@@ -33,6 +33,10 @@ This is a simple UI transcriber that uses Whisper to transcribe audio files.
 - [ ] Add TTS
 - [ ] Add the Whisper Transcriber Microservice
 - [ ] Add Sender Telegram microservice
+- [ ] Rewrite the UI in Vue
+- [ ] Separate the UI from the microservices
+- [ ] Create backend api
+- [ ] Add microservices for authorization
 
 ## Contributing
 
