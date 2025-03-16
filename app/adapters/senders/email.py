@@ -1,10 +1,13 @@
 import logging
 import re
 
+from app.configs import get_email_settings
 from app.drivers import Email, EmailSender
 from app.interfaces import SenderInterface
 
 logger = logging.getLogger("stdout")
+email_settings = get_email_settings()
+logger.debug(f"Email settings: {email_settings}")
 
 
 class EmailSenderAdapter(SenderInterface):
@@ -15,8 +18,8 @@ class EmailSenderAdapter(SenderInterface):
     \nЕсли вы получили это сообщение по ошибке, то сообщите мне по email или в чате.
     """
 
-    def __init__(self, settings):
-        self.sender = EmailSender(settings)
+    def __init__(self):
+        self.sender = EmailSender(email_settings)
         self._email_message = None
         self.__parsed_emails = None
 

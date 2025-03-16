@@ -2,14 +2,12 @@ import uvicorn
 from fastapi import FastAPI, status
 
 from app.adapters import AudioAwsUploader, EmailSenderAdapter, LocalNeuralAudioRecognizer
-from app.configs import LogConfig, get_app_settings, get_email_settings, get_logger
+from app.configs import LogConfig, get_app_settings, get_logger
 from app.webui import AudioConverterPage, AudioTranscribePage, AudioUploadPage, WebUI
 
 logger = get_logger()
 settings = get_app_settings()
-email_settings = get_email_settings()
 
-logger.debug(f"Email settings: {email_settings}")
 
 app = FastAPI(
     title=settings.appname.capitalize(),
@@ -36,7 +34,7 @@ app = WebUI.pages(
             LocalNeuralAudioRecognizer(),
             # AwsAudioUploader(),
             # SberSpeechRecognizer(),
-            EmailSenderAdapter(email_settings),
+            EmailSenderAdapter(),
         ),
     ],
 )
