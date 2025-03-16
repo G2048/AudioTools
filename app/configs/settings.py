@@ -5,13 +5,15 @@ from pydantic import computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .log_settings import set_appname, set_appversion, set_debug_level
+from .pyproject import ParserPyproject
 
 load_dotenv()
+pyproject_parser = ParserPyproject()
 
 
 class AppSettings(BaseSettings):
-    appname: str = "WebUI"
-    appversion: str = "0.0.1"
+    appname: str = ParserPyproject.name
+    appversion: str = ParserPyproject.version
     debug: bool = False
 
     @field_validator("appname")
