@@ -5,7 +5,7 @@ from datetime import datetime
 import gradio as gr
 
 from app.interfaces import Page
-from app.services import AudioConverter, AudioFile
+from app.services import AudioConverter, AudioFiles
 
 logger = logging.getLogger("stdout")
 
@@ -73,7 +73,7 @@ class AudioConverterPage(Page):
         # hash_audio_file = hashlib.md5(audio_path.encode("utf-8")).hexdigest() + ".mp3"
         # logger.info(f"New hashed audio file: {hash_audio_file}")
 
-        audio_file = AudioFile(audio_path, output_path)
+        audio_file = AudioFiles(audio_path, output_path)
         audio_converter = AudioConverter(file=audio_file)
         audio_converter.convert(format=format)
 

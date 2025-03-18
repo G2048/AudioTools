@@ -8,7 +8,7 @@ from gradio import processing_utils
 logger = logging.getLogger("stdout")
 
 
-class AudioFile:
+class AudioFiles:
     __slot__ = ("list_audio", "name", "path", "output_path")
 
     def __init__(self, file_path: str, output_path: str = "."):
@@ -35,7 +35,7 @@ class AudioFile:
 
 
 class AudioConverter:
-    def __init__(self, file: AudioFile):
+    def __init__(self, file: AudioFiles):
         self.file = file
         # self.file = output_file
         # self.file_path = file_path

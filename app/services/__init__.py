@@ -1,2 +1,2 @@
-from .audio import AudioConverter, AudioFile
+from .audio import AudioConverter, AudioFiles
 from .uploader import AwsUploader
