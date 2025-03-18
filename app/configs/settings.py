@@ -67,6 +67,13 @@ class NeuralSettings(BaseSettings):
     name: str
 
 
+class JwtSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="JWT_")
+
+    secret_key: str
+    algorithm: str = "HS256"
+
+
 _app_settings = AppSettings()
 
 
@@ -97,3 +104,7 @@ def get_aws_bucket_settings() -> AwsBucketSettingsConfig:
 
 def get_neural_settings() -> NeuralSettings:
     return NeuralSettings()
+
+
+def get_jwt_settings() -> JwtSettings:
+    return JwtSettings()
