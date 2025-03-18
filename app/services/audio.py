@@ -1,4 +1,6 @@
 import logging
+import os
+from pathlib import Path
 
 import numpy as np
 import pydub
@@ -13,20 +15,20 @@ class AudioFiles:
 
     def __init__(self, file_path: str, output_path: str = "."):
         # name without extension
-        self.path = file_path
-        self.name = os.path.basename(file_path).split(".")[0]
-        self.list_audio = {}
+        self._file = Path(file_path)
+        self.name = self._file.stem
+        self.list_audio: dict[str, None] = {}
         self.output_path = output_path
 
     @classmethod
     def create_from_numpy(cls, audio: np.ndarray):
         return
 
-    def create(self, format: str) -> dict:
-        self.list_audio.update({self.new_path(format): None})
+    def create(self, format: str) -> dict[str, None]:
+        self.list_audio.update({self._new_path(format): None})
         return self.list_audio
 
-    def new_path(self, format: str) -> str:
+    def _new_path(self, format: str) -> str:
         return os.path.join(self.output_path, f"{self.name}.{format}")
 
     # @classmethod
