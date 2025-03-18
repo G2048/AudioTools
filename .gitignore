@@ -171,3 +171,6 @@ out
 gen
 .gradio/*
 *whisper*/
+*.mp3
+*.wav
+*.avi
