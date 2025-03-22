@@ -25,7 +25,7 @@ class LoginTestCase(unittest.TestCase):
         self.user_body = UserLogin(username="admin", password="admin").model_dump_json()
 
     def test_login_post(self):
-        response = self.client.post("/api/v1/login", data=self.user_body)
+        response = self.client.post("/api/v1/login/", data=self.user_body)
         self.assertEqual(response.status_code, 200)
         token_json = response.json()
         self.assertIsInstance(token_json, dict)
@@ -35,17 +35,18 @@ class LoginTestCase(unittest.TestCase):
         return token
 
     def test_check_login_get(self):
-        response = self.client.post("/api/v1/login", data=self.user_body)
+        response = self.client.post("/api/v1/login/", data=self.user_body)
         token_json = response.json()
+        self.assertEqual(response.status_code, 200)
         response = self.client.get(
-            "/api/v1/login", headers={"Authorization": f"Bearer {token_json['access_token']}"}
+            "/api/v1/login/", headers={"Authorization": f"Bearer {token_json['access_token']}"}
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["logged_in"], True)
 
         fail_token = "fail_token"
         wrong_response = self.client.get(
-            "/api/v1/login",
+            "/api/v1/login/",
             headers={"Authorization": f"Bearer {fail_token}"},
         )
         self.assertEqual(wrong_response.status_code, 401)
@@ -53,8 +54,9 @@ class LoginTestCase(unittest.TestCase):
 
     def test_check_login_expired_token(self):
         token = JWT().generate_token({"username": "admin"}, live_days=0)
+        print(f"Generated token: {token}")
 
-        wrong_response = self.client.get("/api/v1/login", headers={"Authorization": f"Bearer {token}"})
+        wrong_response = self.client.get("/api/v1/login/", headers={"Authorization": f"Bearer {token}"})
         self.assertEqual(wrong_response.status_code, 401)
         self.assertEqual(wrong_response.json()["detail"], "Token expired")
 
