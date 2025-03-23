@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 
 import numpy as np
-import pydub
 from ffmpy import FFmpeg
+from pydub import AudioSegment
 
 from app.interfaces.audio import AudioConverterInterface, AudioFilesInterfase
 
@@ -62,14 +62,27 @@ class AudioConverter(AudioConverterInterface):
             logger.error(f"String for execution: {ff.cmd}")
 
     @staticmethod
-    def to_numpy(file: str) -> np.ndarray:
-        return processing_utils.audio_from_file(file)
-
-    @staticmethod
-    def to_format(audio: np.ndarray):
-        # pydub.AudioSegment.from_mp3()
-        segment = pydub.AudioSegment.from_file(file, format)
-        np_array = np.array(segment.get_array_of_samples())
+    def to_numpy(filename: str, crop_min: float = 0, crop_max: float = 100) -> tuple[int, np.ndarray]:
+        try:
+            segment = AudioSegment.from_file(filename)
+        except FileNotFoundError as e:
+            isfile = Path(filename).is_file()
+            msg = (
+                f"Cannot load audio from file: `{'ffprobe' if isfile else filename}` not found."
+                + " Please install `ffmpeg` in your system to use non-WAV audio file formats"
+                " and make sure `ffprobe` is in your PATH."
+                if isfile
+                else ""
+            )
+            raise RuntimeError(msg) from e
+        except OSError as e:
+            raise e
+        if crop_min != 0 or crop_max != 100:
+            audio_start = len(segment) * crop_min / 100
+            audio_end = len(segment) * crop_max / 100
+            segment = segment[audio_start:audio_end]
+        data = np.array(segment.get_array_of_samples())
         if segment.channels > 1:
-            np_array = np.mean(np_array, axis=1)
-        return segment.frame_rate, np_array
+            data = data.reshape(-1, segment.channels)
+            # np_array = np.mean(np_array, axis=1)
+        return segment.frame_rate, data
