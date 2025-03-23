@@ -22,10 +22,14 @@ class LoginTestCase(unittest.TestCase):
         # cls.jwt_settings = JwtSettings(secret_key="test_secret_key")
 
     def setUp(self) -> None:
-        self.user_body = UserLogin(username="admin", password="admin").model_dump_json()
+        self.user_body = UserLogin(username="admin", password="admin").to_url_form()
 
     def test_login_post(self):
-        response = self.client.post("/api/v1/login/", data=self.user_body)
+        response = self.client.post(
+            "/api/v1/login/",
+            data=self.user_body,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
         self.assertEqual(response.status_code, 200)
         token_json = response.json()
         self.assertIsInstance(token_json, dict)
@@ -35,7 +39,11 @@ class LoginTestCase(unittest.TestCase):
         return token
 
     def test_check_login_get(self):
-        response = self.client.post("/api/v1/login/", data=self.user_body)
+        response = self.client.post(
+            "/api/v1/login/",
+            data=self.user_body,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
         token_json = response.json()
         self.assertEqual(response.status_code, 200)
         response = self.client.get(
