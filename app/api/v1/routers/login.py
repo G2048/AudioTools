@@ -1,14 +1,16 @@
 import logging
 from http import HTTPStatus
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestFormStrict
 
-from app.api.models.users import Token, UserLogin
+from app.api.models.users import Token
 from app.services.jwt import JWT, ExpiredSignatureError, InvalidTokenError
 
 router = APIRouter(
-    prefix="/login",
+    prefix="/api/v1/login",
     tags=["Authorization"],
 )
 logger = logging.getLogger("stdout")
@@ -19,10 +21,16 @@ def check_auth(username: str, password: str) -> bool:
     return True
 
 
+# security = HTTPBasic()
+security = OAuth2PasswordBearer(tokenUrl="/api/v1/login/")
+
+
 @router.post("/")
-async def login(body: UserLogin) -> Token:
+async def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> Token:
+    logger.debug(f"Body: {body=}")
     username = body.username.partition("@")[0]
     logged_in = check_auth(username, body.password)
+    logger.info(f"Username: {username=}")
     if not logged_in:
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
@@ -33,24 +41,22 @@ async def login(body: UserLogin) -> Token:
 
 
 @router.get("/")
-async def check_login(request: Request):
+async def check_login(token: Annotated[str, Depends(security)]):
+    logger.debug(f"Token: {token=}")
     jwt = JWT()
-    token = request.headers.get("Authorization", "")
-    clear_token = token.replace("Bearer ", "")
-    logger.debug(f"Token: {clear_token=}")
 
     logged_in = False
     status_code = HTTPStatus.UNAUTHORIZED
     error = False
-    if clear_token:
+    if token:
         try:
-            jwt_token = jwt.validate(clear_token)
+            jwt_token = jwt.validate(token)
         except ExpiredSignatureError:
-            logger.info(f"Token expired: {jwt.payload(clear_token)=}")
+            logger.info(f"Token expired: {jwt.payload(token)=}")
             detail = "Token expired"
             error = True
         except InvalidTokenError:
-            logger.info(f"Token invalid: {clear_token=}")
+            logger.info(f"Token invalid: {token=}")
             detail = "Invalid token"
             error = True
 
