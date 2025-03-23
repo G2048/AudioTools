@@ -40,3 +40,23 @@ class SpeechRecognizerInterface(ABC):
     @abstractmethod
     def recognize(self, audio_file: str, channels_count: int) -> RecognizedText:
         pass
+
+
+class AudioConverterInterface(ABC):
+    @abstractmethod
+    def convert(self):
+        pass
+
+    @abstractmethod
+    def convert_ogg(self):
+        pass
+
+    @abstractmethod
+    def convert_wav(self):
+        pass
+
+
+class AudioFilesInterfase(ABC):
+    @abstractmethod
+    def create(self, format: str) -> dict[str, None]:
+        pass
