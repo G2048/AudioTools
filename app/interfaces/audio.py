@@ -9,7 +9,7 @@ class AudioUploaderInterface(ABC):
 
 class AudioConverterInterface(ABC):
     @abstractmethod
-    def convert(self):
+    def convert(self, format: str):
         pass
 
 
