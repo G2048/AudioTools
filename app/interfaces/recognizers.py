@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
+from enum import StrEnum
 from typing import BinaryIO, TypeAlias
 
 from pydantic import BaseModel
 
-start_time: TypeAlias = str
-end_time: TypeAlias = str
+Start_Time: TypeAlias = str
+End_Time: TypeAlias = str
 
 
 class RecognizedText(BaseModel):
-    timestamps: tuple[start_time, end_time]
+    timestamps: tuple[Start_Time, End_Time]
     text: str
 
 
@@ -28,9 +29,21 @@ class RecognizedTextInterface(ABC):
         pass
 
 
-task_id: TypeAlias = str
-file_id: TypeAlias = str
-status: TypeAlias = str
+class Status(StrEnum):
+    NEW = "NEW"
+    PROCESSING = "PROCESSING"
+    SUCCESS = "SUCCESS"
+    ERROR = "ERROR"
+    NONE = "NONE"
+
+
+Task_id: TypeAlias = str
+File_id: TypeAlias = str
+
+
+class CheckStatusFileID(BaseModel):
+    status: Status
+    file_id: File_id
 
 
 class RecognizerInterface(ABC):
@@ -40,13 +53,17 @@ class RecognizerInterface(ABC):
         pass
 
     @abstractmethod
-    def recognize(self, audio_file: BinaryIO) -> task_id:
+    def _create_task_id(self) -> Task_id:
         pass
 
     @abstractmethod
-    def check_status(self, task_id: str) -> dict[status, file_id]:
+    def send(self, audio_file: BinaryIO) -> Task_id:
         pass
 
     @abstractmethod
-    def download_file(self, file_id: str) -> RecognizedTextInterface:
+    def check_status(self, task_id: Task_id) -> CheckStatusFileID | dict[Status, File_id]:
+        pass
+
+    @abstractmethod
+    def download(self, file_id: File_id) -> RecognizedTextInterface:
         pass
