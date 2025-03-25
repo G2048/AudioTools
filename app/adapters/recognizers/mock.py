@@ -1,13 +1,14 @@
 import logging
 import uuid
-from enum import StrEnum
 from typing import BinaryIO
 
 from app.interfaces.recognizers import (
+    File_id,
     RecognizedText,
     RecognizedTextInterface,
     RecognizedTexts,
     RecognizerInterface,
+    Status,
 )
 
 logger = logging.getLogger("stdout")
@@ -28,29 +29,29 @@ class MockRecognizedText(RecognizedTextInterface):
         return RecognizedTexts(chunk_texts=processing_text)
 
 
-class StatusRecognize(StrEnum):
-    PROCESSING = "processing"
-    SUCCESS = "success"
-    ERROR = "error"
-    NONE = "none"
-
-
 class MockRecognizer(RecognizerInterface):
-    def _create_task_id(self):
+    _tasks = {}
+
+    def _create_task_id(self) -> str:
         return uuid.uuid1().hex
+
+    @staticmethod
+    def _create_file_id() -> str:
+        return str(uuid.uuid1())
 
     @property
     def name(self) -> str:
         return "mock"
 
-    def recognize(self, audio_file: BinaryIO) -> str:
+    def send(self, audio_file: BinaryIO) -> str:
         task_id = self._create_task_id()
-        self.tasks[task_id] = StatusRecognize.PROCESSING
+        # Write to DB status processing of file_id
+        self._tasks[task_id] = {"status": Status.PROCESSING, "file_id": self._create_file_id}
         logger.info(f"Create task_id: {task_id}")
         return task_id
 
-    def check_status(self, task_id: str) -> dict[str, str]:
-        return self.tasks.get(task_id, None) or {"status": StatusRecognize.NONE, "file_id": ""}
+    def check_status(self, task_id: str) -> dict[Status, File_id]:
+        return self._tasks.get(task_id) or {"status": Status.NONE, "file_id": ""}
 
-    def download_file(self, file_id: str) -> MockRecognizedText:
+    def download(self, file_id: str) -> MockRecognizedText:
         return MockRecognizedText()
