@@ -1,4 +1,6 @@
 import logging
+import threading
+import time
 import uuid
 from typing import BinaryIO
 
@@ -43,10 +45,17 @@ class MockRecognizer(RecognizerInterface):
     def name(self) -> str:
         return "mock"
 
+    def _imitation_task(self, task_id: str) -> None:
+        time.sleep(10)
+        self._tasks[task_id]["status"] = Status.SUCCESS
+        logger.info(f"Task_id {task_id} is done")
+
     def send(self, audio_file: BinaryIO) -> str:
         task_id = self._create_task_id()
         # Write to DB status processing of file_id
         self._tasks[task_id] = {"status": Status.PROCESSING, "file_id": self._create_file_id()}
+        thread_task = threading.Thread(target=self._imitation_task, args=(task_id,), daemon=True)
+        thread_task.start()
         logger.info(f"Create task_id: {task_id}")
         return task_id
 
