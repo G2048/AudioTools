@@ -1,3 +1,4 @@
+import time
 import unittest
 
 from app.adapters.recognizers.mock import MockRecognizer
@@ -24,6 +25,34 @@ class TestMockRecognizer(unittest.TestCase):
         print(f"{status_file_id=}")
         self.assertIsInstance(status_file_id["file_id"], str)
         self.assertEqual(status_file_id["status"], Status.PROCESSING)
+
+    def test_multiple_tasks(self):
+        task_id_1 = self.client.send(b"hello world")
+        task_id_2 = self.client.send(b"Clean up the mess")
+        self.assertNotEqual(task_id_1, task_id_2)
+        self.assertEqual(len(self.client._tasks), 3)
+        status_file_id_1 = self.client.check_status(task_id_1)
+        status_file_id_2 = self.client.check_status(task_id_2)
+        
+        while status_file_id_2["status"] != Status.SUCCESS and status_file_id_1["status"] != Status.SUCCESS:
+            status_file_id = self.client.check_status(self.task_id)
+            time.sleep(5)
+            print(f"{status_file_id=}")
+
+        self.assertIsInstance(status_file_id_1["file_id"], str)
+        self.assertEqual(status_file_id_1["status"], Status.SUCCESS)
+        self.assertIsInstance(status_file_id_2["file_id"], str)
+        self.assertEqual(status_file_id_2["status"], Status.SUCCESS)
+
+    def test_wait_status_success(self):
+        status_file_id = self.client.check_status(self.task_id)
+        print(f"{status_file_id=}")
+        while status_file_id["status"] != Status.SUCCESS:
+            status_file_id = self.client.check_status(self.task_id)
+            time.sleep(5)
+            print(f"{status_file_id=}")
+        self.assertIsInstance(status_file_id["file_id"], str)
+        self.assertEqual(status_file_id["status"], Status.SUCCESS)
 
     def test_download(self):
         self.client.download(self.task_id)
