@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import StrEnum
-from typing import BinaryIO, TypeAlias
+from typing import Any, BinaryIO, TypeAlias
 
 from pydantic import BaseModel
 
@@ -43,7 +43,8 @@ File_id: TypeAlias = str
 
 class CheckStatusFileID(BaseModel):
     status: Status
-    file_id: File_id
+    file_id: File_id | None
+    result: Any | None
 
 
 class RecognizerInterface(ABC):
@@ -65,5 +66,5 @@ class RecognizerInterface(ABC):
         pass
 
     @abstractmethod
-    def download(self, file_id: File_id) -> RecognizedTextInterface:
+    def download(self, task_id: Task_id) -> RecognizedTextInterface:
         pass

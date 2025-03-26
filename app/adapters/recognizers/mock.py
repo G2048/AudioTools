@@ -62,5 +62,5 @@ class MockRecognizer(RecognizerInterface):
     def check_status(self, task_id: str) -> dict[Status, File_id]:
         return self._tasks.get(task_id) or {"status": Status.NONE, "file_id": ""}
 
-    def download(self, file_id: str) -> MockRecognizedText:
+    def download(self, task_id: str) -> MockRecognizedText:
         return MockRecognizedText()
