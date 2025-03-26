@@ -3,6 +3,7 @@ from fastapi import FastAPI, status
 
 # from app.adapters import AudioAwsUploader, EmailSenderAdapter, WhisperRecognizer
 # from app.webui import AudioConverterPage, AudioTranscribePage, AudioUploadPage, WebUI
+from app.api.v1 import routers as routers_v1
 from app.configs import LogConfig, get_app_settings, get_logger
 
 logger = get_logger()
@@ -23,7 +24,7 @@ def health():
     return {"status": "ok"}
 
 
-# app.include_router(routers_v1.login)
+app.include_router(routers_v1.login)
 
 # app = WebUI(AudioPage()).mount(app)
 # app = WebUI.pages(

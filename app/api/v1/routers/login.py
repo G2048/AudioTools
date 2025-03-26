@@ -21,12 +21,11 @@ def check_auth(username: str, password: str) -> bool:
     return True
 
 
-# security = HTTPBasic()
 security = OAuth2PasswordBearer(tokenUrl="/api/v1/login/")
 
 
 @router.post("/")
-async def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> Token:
+def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> Token:
     logger.debug(f"Body: {body=}")
     username = body.username.partition("@")[0]
     logged_in = check_auth(username, body.password)
@@ -41,7 +40,7 @@ async def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> 
 
 
 @router.get("/")
-async def check_login(token: Annotated[str, Depends(security)]):
+def check_login(token: Annotated[str, Depends(security)]):
     logger.debug(f"Token: {token=}")
     jwt = JWT()
 
