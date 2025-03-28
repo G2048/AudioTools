@@ -10,7 +10,7 @@ from app.interfaces import FileInterface, UploaderInterface
 class S3File(FileInterface):
     def __init__(self, s3bucket: S3Bucket, file: str, file_path: str = "."):
         self.s3_bucket = s3bucket
-        self.file_name = file
+        self.file_name = Path(file)
         self.path = self._create_path_file(file_path)
         self._logger = logging.getLogger("stdout")
 
@@ -20,7 +20,7 @@ class S3File(FileInterface):
 
     def upload(self, path: str = ".") -> Self:
         file_path = str(Path(path) / self.file_name)
-        object_path = str(self.path / self.file_name.split("/")[-1])
+        object_path = (self.path / self.file_name).name
         self._logger.info(f"Uploading {file_path} to {object_path}")
 
         self.s3_bucket.upload_file(file_path, object_path)
@@ -40,14 +40,14 @@ class S3File(FileInterface):
         return object_response["Body"].read()
 
     def delete(self):
-        object_path = str(self.path / self.file_name)
-        response = self.s3_bucket.delete_objects([{"Key": object_path}])
+        response = self.s3_bucket.delete_objects([{"Key": self.file_name.name}])
         self._logger.debug(f"{response=}")
-        assert response["Deleted"][0]["Key"] == object_path
+        assert response["Deleted"][0]["Key"] == self.file_name.name
         self._logger.info(f"File {self.file_name} deleted")
 
     def list_files(self) -> list[dict[Any, Any]]:
-        return self.s3_bucket.list_objects()["Contents"]
+        objects = self.s3_bucket.list_objects()
+        return objects.get("Contents", [])
 
 
 class AwsUploader(UploaderInterface):

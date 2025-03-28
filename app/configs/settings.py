@@ -57,8 +57,8 @@ class AwsBucketSettingsConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="AWS_")
 
     bucket_name: str
-    object_path: str
-    directory_path: str
+    object_path: Optional[str] = None
+    directory_path: Optional[str] = None
 
 
 class NeuralSettings(BaseSettings):
