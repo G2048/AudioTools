@@ -1,7 +1,9 @@
 import logging
+import os
 import threading
 import uuid
-from pathlib import Path
+from io import BytesIO
+from tempfile import NamedTemporaryFile
 from typing import BinaryIO
 
 import numpy as np
@@ -31,7 +33,7 @@ class NeuralRecognizedText(RecognizedTextInterface):
         processing_text = [
             RecognizedText(
                 timestamps=(str(chunk["timestamp"][0]), str(chunk["timestamp"][1])),
-                text=chunk["text"],
+                text=chunk["text"].removeprefix(" "),
             )
             for chunk in self.chunks
         ]
@@ -53,15 +55,16 @@ class WhisperRecognizer(RecognizerInterface):
 
     @property
     def name(self) -> str:
-        return neural_settings.name
+        return neural_settings.name.replace(".", "").replace("/", "")
 
     def send(self, audio_file: BinaryIO) -> str:
         task_id = self._create_task_id()
         self._TASKS[task_id] = {"status": Status.PROCESSING, "file_id": self._create_file_id()}
         logger.info(f"Create task for Neural {self.name}: {task_id}")
 
+        tmp_audio_file = self._create_tmp_file(audio_file)
         # audio_array = self.binay_io_to_numpy(audio_file)
-        thread_task = threading.Thread(target=self._transcribe, args=(audio_file.name, task_id), daemon=True)
+        thread_task = threading.Thread(target=self._transcribe, args=(tmp_audio_file, task_id), daemon=True)
         thread_task.start()
         return task_id
 
@@ -78,19 +81,20 @@ class WhisperRecognizer(RecognizerInterface):
         return np.frombuffer(binary_io.read(), dtype=np.uint8)
 
     @staticmethod
-    def _audio_from_file(filename: str, crop_min: float = 0, crop_max: float = 100) -> tuple[int, np.ndarray]:
+    def _audio_from_file(
+        filename: BytesIO, crop_min: float = 0, crop_max: float = 100
+    ) -> tuple[int, np.ndarray]:
+        logger.debug(f"Convert to numpy Audio file: {filename=}")
         try:
-            audio = AudioSegment.from_file(filename)
+            audio = AudioSegment.from_file(filename.name)
         except FileNotFoundError as e:
-            isfile = Path(filename).is_file()
             msg = (
-                f"Cannot load audio from file: `{'ffprobe' if isfile else filename}` not found."
+                f"Cannot load audio from file: `{filename}` not found."
                 + " Please install `ffmpeg` in your system to use non-WAV audio file formats"
                 " and make sure `ffprobe` is in your PATH."
-                if isfile
-                else ""
             )
             raise RuntimeError(msg) from e
+        logger.debug(f"Audio segment: {audio=}")
         if crop_min != 0 or crop_max != 100:
             audio_start = len(audio) * crop_min / 100
             audio_end = len(audio) * crop_max / 100
@@ -100,11 +104,24 @@ class WhisperRecognizer(RecognizerInterface):
             data = data.reshape(-1, audio.channels)
         return audio.frame_rate, data
 
-    def _transcribe(self, audio_file: str, task_id: str):
-        print(f"Transcribe audio:{audio_file=}")
-        sr, y = self._audio_from_file(audio_file)
-        logger.info(f"Audio size: {y.shape}")
-        logger.info(f"Audio sampling rate: {sr}")
+    @staticmethod
+    def _create_tmp_file(audio_file: BytesIO) -> str:
+        tmp_file = NamedTemporaryFile(delete=False)
+        tmp_file.writelines(audio_file)
+        return tmp_file.file
+
+    def _transcribe(self, audio_file: BytesIO, task_id: str):
+        try:
+            logger.debug(f"Transcribe audio:{audio_file=}")
+            sr, y = self._audio_from_file(audio_file)
+            logger.info(f"Audio size: {y.shape}")
+            logger.info(f"Audio sampling rate: {sr}")
+        except Exception as e:
+            self._TASKS[task_id]["status"] = Status.ERROR
+            logger.error(f"Error While coverting file to numpy: {e}")
+            return
+        finally:
+            os.remove(audio_file.name)
 
         # Convert to mono if stereo
         if y.ndim > 1:
