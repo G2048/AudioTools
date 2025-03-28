@@ -25,6 +25,7 @@ def health():
 
 
 app.include_router(routers_v1.login)
+app.include_router(routers_v1.audio)
 
 # app = WebUI(AudioPage()).mount(app)
 # app = WebUI.pages(

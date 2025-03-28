@@ -1,0 +1,91 @@
+import logging
+import os
+import tempfile
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, UploadFile
+from pydantic import BaseModel
+
+from app.api.dependencies.auth import check_auth
+from app.api.dependencies.providers import get_providers, get_recognizer
+from app.api.models.audio import CheckStatusTaskID
+from app.interfaces.recognizers import RecognizedTexts, RecognizerInterface
+
+logger = logging.getLogger("stdout")
+router = APIRouter(prefix="/api/v1/audio", tags=["Audio Trinscribe"], dependencies=[Depends(check_auth)])
+
+
+# provider = recognizers_fabric["mock"]
+
+
+class AvailableRecognizers(BaseModel):
+    providers: list[str]
+
+
+@router.get("/providers", response_model=AvailableRecognizers)
+async def get_available_recognizers(
+    providers: Annotated[list[str], Depends(get_providers)],
+) -> AvailableRecognizers:
+    return AvailableRecognizers(providers=providers)
+
+
+# Взять с помощью специального заголовка
+@router.get("/status/mock/{task_id}")
+def mock_check_status_id(task_id: str, client: str = Depends(get_recognizer)) -> CheckStatusTaskID:
+    status, file_id = client.check_status(task_id)
+    return CheckStatusTaskID(status=status, file_id=file_id)
+
+
+# TODO: Здесь нужно сделать выбор распознавателя на уровне клиента api
+# Сделать выбор распознавателя в виде enum
+@router.post("/")
+def send_audio_for_transcription(
+    audiofile: UploadFile,
+    provider: Annotated[RecognizerInterface, Depends(get_recognizer)],
+) -> dict[str, str]:
+    logger.debug(f"Type {audiofile.file=}")
+    logger.debug(f"Type {audiofile.filename=}")
+    # with open(audiofile.file, "rb") as f:
+    audiofile.name = audiofile.filename
+    task_id = provider.send(audiofile.file)
+    return {"task_id": task_id}
+
+
+# TODO: здесь нужно придумать какую-то фабрику....
+@router.get("/status/{task_id}")
+def check_status_id(
+    task_id: str,
+    provider: Annotated[RecognizerInterface, Depends(get_recognizer)],
+) -> CheckStatusTaskID:
+    task_status = provider.check_status(task_id)
+    return CheckStatusTaskID(status=task_status["status"], file_id=task_status["file_id"])
+
+
+def write_to_temp_file(text: str) -> str:
+    fd, path = tempfile.mkstemp(suffix=".txt")
+    with os.fdopen(fd, "w") as f:
+        f.write(text)
+    return path
+
+
+@router.get("/")
+def get_audio_transcription(
+    task_id: str,
+    provider: Annotated[RecognizerInterface, Depends(get_recognizer)],
+    # with_timestamp: bool = False,
+) -> RecognizedTexts | None:
+    logger.info(f"Download {task_id} file...")
+    recognized_text = provider.download(task_id)
+    if recognized_text is None:
+        return
+
+    return recognized_text.get_ready_text()
+    # path = write_to_temp_file(recognized_text.get_ready_text(with_timestamp))
+    # path = write_to_temp_file(recognized_text.get_ready_text())
+    # remove_task = partial(os.remove, path)
+    # return FileResponse(
+    #     path=path,
+    #     media_type="text/text",
+    #     background=BackgroundTask(remove_task),
+    #     status_code=HTTPStatus.OK,
+    # )
