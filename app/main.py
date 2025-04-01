@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import routers as routers_v1
 from app.configs import LogConfig, get_app_settings, get_logger
@@ -14,6 +15,14 @@ app = FastAPI(
     version=settings.appversion,
     debug=settings.debug,
     swagger_ui_parameters={"syntaxHighlight": {"theme": "obsidian"}},
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
