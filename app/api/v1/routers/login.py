@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestFormStri
 
 from app.api.dependencies.auth import check_auth
 from app.api.models.users import Token
-from app.services.jwt import JWT
+from app.services.jwt import JWT, JwtPayload
 
 router = APIRouter(
     prefix="/api/v1/login",
@@ -35,7 +35,7 @@ def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> Token:
             status_code=HTTPStatus.UNAUTHORIZED,
             detail="Incorrect username or password",
         )
-    token = JWT().generate_token({"username": username})
+    token = JWT().generate_token(JwtPayload(sub=username))
     return Token(access_token=token, token_type="bearer")
 
 

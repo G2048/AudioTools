@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 
 from app.api.models import Token, UserLogin
 from app.main import app
-from app.services.jwt import JWT
+from app.services.jwt import JWT, JwtPayload
 
 logger = logging.getLogger("asyncio")
 logger.propagate = False
@@ -61,7 +61,7 @@ class LoginTestCase(unittest.TestCase):
         self.assertEqual(wrong_response.json()["detail"], "Invalid token")
 
     def test_check_login_expired_token(self):
-        token = JWT().generate_token({"username": "admin"}, live_days=0)
+        token = JWT().generate_token(JwtPayload(sub="admin", token_ttl=0))
         print(f"Generated token: {token}")
 
         wrong_response = self.client.get("/api/v1/login/", headers={"Authorization": f"Bearer {token}"})
