@@ -11,11 +11,11 @@ class JwtPayload(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     sub: str
-    token_ttl: int = 20 * 24 * 60 * 60
+    ttl: int = 20 * 24 * 60 * 60
 
     @computed_field(return_type=int)
     def exp(self):
-        expiration_time = datetime.now() + timedelta(seconds=self.token_ttl)
+        expiration_time = datetime.now() + timedelta(seconds=self.ttl)
         return int(expiration_time.timestamp())
 
     @computed_field(return_type=int)
