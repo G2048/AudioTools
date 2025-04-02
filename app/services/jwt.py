@@ -11,7 +11,7 @@ class JwtPayload(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     sub: str
-    ttl: int = 20 * 24 * 60 * 60
+    ttl: int = 900
 
     @computed_field(return_type=int)
     def exp(self):
