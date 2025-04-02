@@ -29,14 +29,17 @@ class JWT:
     SECRET_KEY = _jwt_settings.secret_key
     ALGORITHM = _jwt_settings.algorithm
 
-    def generate_token(self, payload: JwtPayload) -> str:
-        return jwt.encode(payload.model_dump(), self.SECRET_KEY, algorithm=self.ALGORITHM)
+    @classmethod
+    def generate_token(cls, payload: JwtPayload) -> str:
+        return jwt.encode(payload.model_dump(), cls.SECRET_KEY, algorithm=cls.ALGORITHM)
 
-    def validate(self, token: str) -> JwtPayload:
-        _jwt = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
+    @classmethod
+    def validate(cls, token: str) -> JwtPayload:
+        _jwt = jwt.decode(token, cls.SECRET_KEY, algorithms=[cls.ALGORITHM])
         return JwtPayload(**_jwt)
 
-    def payload(self, token: str) -> JwtPayload:
+    @classmethod
+    def payload(cls, token: str) -> JwtPayload:
         _jwt = jwt.decode(token, options={"verify_signature": False})
         return JwtPayload(**_jwt)
 

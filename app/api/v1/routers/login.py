@@ -35,7 +35,7 @@ def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> Token:
             status_code=HTTPStatus.UNAUTHORIZED,
             detail="Incorrect username or password",
         )
-    token = JWT().generate_token(JwtPayload(sub=username))
+    token = JWT.generate_token(JwtPayload(sub=username))
     return Token(access_token=token, token_type="bearer")
 
 
