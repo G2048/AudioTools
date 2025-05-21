@@ -8,9 +8,9 @@ from typing import BinaryIO
 
 import numpy as np
 from pydub import AudioSegment
-from transformers import Pipeline, pipeline
 
 from app.configs import get_neural_settings
+from app.drivers.neurals.whisper import NeuralException, Whisper
 from app.interfaces.recognizers import (
     CheckStatusFileID,
     Chunk,
@@ -42,9 +42,7 @@ class NeuralRecognizedText(IRecognizedText):
 
 
 class WhisperRecognizer(IRecognizer):
-    __transcriber: Pipeline = pipeline(
-        "automatic-speech-recognition", max_new_tokens=445, model=neural_settings.name
-    )
+    _whisper: Whisper = Whisper(neural_settings.name)
     _TASKS = {}
 
     @staticmethod
@@ -123,26 +121,15 @@ class WhisperRecognizer(IRecognizer):
         try:
             logger.debug(f"Transcribe audio:{audio_file=}")
             sr, y = self._audio_from_file(audio_file)
-            logger.info(f"Audio size: {y.shape}")
-            logger.info(f"Audio sampling rate: {sr}")
         except Exception as e:
             self._TASKS[task_id]["status"] = Status.ERROR
             logger.error(f"Error While coverting file to numpy: {e}")
             return
         finally:
             os.remove(audio_file.name)
-
-        # Convert to mono if stereo
-        if y.ndim > 1:
-            y = y.mean(axis=1)
-
-        y = y.astype(np.float32)
-        y /= np.max(np.abs(y))
         try:
-            transcribed_text = self.__transcriber(
-                {"sampling_rate": sr, "raw": y}, return_timestamps=True
-            )
-        except Exception as e:
+            transcribed_text = self._whisper.transcribe(sr, y)
+        except NeuralException as e:
             self._TASKS[task_id]["status"] = Status.ERROR
             logger.error(f"Error While transcribing: {e}")
             return
