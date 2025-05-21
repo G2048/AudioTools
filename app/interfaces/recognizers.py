@@ -43,7 +43,7 @@ class Status(StrEnum):
 class CheckStatusFileID(BaseModel):
     status: Status
     file_id: File_id
-    result: Any | None
+    result: Any | None = None
 
 
 class IRecognizer(ABC):
