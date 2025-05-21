@@ -1,4 +1,5 @@
-# from app.adapters.recognizers import api, mock, neural
+from typing import Self
+
 from fastapi.exceptions import HTTPException
 
 from app.adapters.recognizers import mock, neural
@@ -6,15 +7,21 @@ from app.interfaces.recognizers import RecognizerInterface
 
 
 class Providers:
-    # class FabricRecognizers:
+    __instance = None
     __registered_fabric: dict[str, RecognizerInterface] = {}
+
+    def __new__(cls) -> Self:
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
     @classmethod
     def register(cls, recognizer: RecognizerInterface):
         cls.__registered_fabric[recognizer.name] = recognizer
 
-    def list(self) -> list[str]:
-        return list(self.__registered_fabric.keys())
+    @classmethod
+    def list(cls) -> list[str]:
+        return list(cls.__registered_fabric.keys())
 
     def __getattr__(self, name: str) -> RecognizerInterface:
         if name in self.__registered_fabric:
