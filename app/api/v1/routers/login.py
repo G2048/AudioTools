@@ -13,7 +13,7 @@ router = APIRouter(
     prefix="/api/v1/login",
     tags=["Authorization"],
 )
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.api.v1.routers")
 
 
 # TODO: add check logick for authentication

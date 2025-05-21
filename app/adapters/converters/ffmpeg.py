@@ -6,7 +6,7 @@ import numpy as np
 from app.interfaces.audio import AudioConverterInterface
 from pydub import AudioSegment
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.adapters.converters")
 
 
 class AudioConverter(AudioConverterInterface):

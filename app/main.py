@@ -36,6 +36,7 @@ app.include_router(routers_v1.audio)
 
 
 if __name__ == "__main__":
+    logger.info("Starting server api...")
     uvicorn.run(
         "app.main:app", host="0.0.0.0", port=8080, reload=False, log_config=LogConfig
     )

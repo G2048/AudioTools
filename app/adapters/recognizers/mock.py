@@ -13,7 +13,7 @@ from app.interfaces.recognizers import (
     Status,
 )
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.adapters.recognizers")
 
 
 class MockRecognizedText(RecognizedTextInterface):

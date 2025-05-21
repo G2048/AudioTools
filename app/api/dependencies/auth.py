@@ -10,7 +10,7 @@ from app.api.services.jwt import JWT, ExpiredSignatureError, InvalidTokenError
 
 security = OAuth2PasswordBearer(tokenUrl="/api/v1/login/")
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.api.dependencies")
 
 jwt = JWT()
 

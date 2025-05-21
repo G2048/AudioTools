@@ -54,7 +54,7 @@ class AudioConverterInterface(ABC):
 
 
 # class SenderFile(ABC):
-#     logger = logging.getLogger("stdout")
+#     logger = logging.getLogger("app.core.audio")
 #     # def __init__(self, audiofile: BinaryIO):
 #     #     self._audiofile = audiofile
 

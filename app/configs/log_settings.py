@@ -125,16 +125,6 @@ LogConfig = {
         },
     },
     "handlers": {
-        "rotate": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": f"{_appname}.log",
-            "mode": "w",
-            "level": LOG_LEVEL,
-            "maxBytes": 204800,
-            "backupCount": 15,
-            "formatter": "details",
-            "filters": ["router"],
-        },
         "console": {
             "class": "logging.StreamHandler",
             "level": LOG_LEVEL,
@@ -161,10 +151,12 @@ LogConfig = {
         },
     },
     "loggers": {
-        "root": {
-            "level": "NOTSET",
+        "": {
+            "level": LOG_LEVEL,
+            "handlers": ["jsonq"],
+            "propagate": False,
         },
-        "stdout": {
+        "app": {
             "level": LOG_LEVEL,
             "handlers": ["jsonq"],
             "propagate": False,
@@ -203,7 +195,7 @@ LogConfig = {
 }
 
 
-def get_logger(name="stdout"):
+def get_logger(name="app"):
     logging.config.dictConfig(LogConfig)
     return logging.getLogger(name)
 
@@ -211,7 +203,6 @@ def get_logger(name="stdout"):
 def set_appname(name: str):
     global _appname
     _appname = name
-    LogConfig["handlers"]["rotate"]["filename"] = f"{name}.log"
 
 
 def set_debug_level(debug: bool):

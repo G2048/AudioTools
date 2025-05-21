@@ -6,7 +6,7 @@ import gradio as gr
 from app.interfaces import Page
 from app.services import AudioConverter, AudioFiles
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.webui.pages.audio")
 
 
 @dataclass

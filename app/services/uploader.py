@@ -13,7 +13,7 @@ class S3File(FileInterface):
         self.s3_bucket = s3bucket
         self.file_name = Path(file)
         self.path = self._create_path_file(file_path)
-        self._logger = logging.getLogger("stdout")
+        self._logger = logging.getLogger("app.services.uploader")
 
     @property
     def name(self) -> str:

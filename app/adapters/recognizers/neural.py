@@ -18,7 +18,7 @@ from app.interfaces.recognizers import (
 from pydub import AudioSegment
 from transformers import Pipeline, pipeline
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.adapters.recognizers")
 
 # LLMMODEL = "./whisper-large-v3"
 neural_settings = get_neural_settings()

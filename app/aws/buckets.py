@@ -2,7 +2,7 @@ import logging
 
 from .base import S3Client
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.aws")
 
 
 class S3Bucket:

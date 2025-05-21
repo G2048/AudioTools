@@ -5,7 +5,7 @@ from app.configs import get_email_settings
 from app.drivers import Email, EmailSender
 from app.interfaces import SenderInterface
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.adapters.senders")
 email_settings = get_email_settings()
 logger.debug(f"Email settings: {email_settings}")
 

@@ -10,7 +10,7 @@ from app.interfaces.recognizers import RecognizedTexts, RecognizerInterface
 from fastapi import APIRouter, Depends, UploadFile
 from pydantic import BaseModel
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.api.v1.routers")
 router = APIRouter(
     prefix="/api/v1/audio",
     tags=["Audio Trinscribe"],

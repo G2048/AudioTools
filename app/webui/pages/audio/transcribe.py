@@ -10,7 +10,7 @@ from app.interfaces import (
     SenderInterface,
 )
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.webui.pages.audio")
 
 
 class AudioTranscribePage(Page):

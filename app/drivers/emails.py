@@ -9,7 +9,7 @@ from typing import Self
 
 from app.configs.settings import EmailSettings
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.drivers.emails")
 
 
 class Email:

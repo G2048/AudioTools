@@ -7,7 +7,7 @@ from app.services.uploader import AwsUploader
 aws_settings = get_aws_settings()
 bucket_settings = get_aws_bucket_settings()
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.adapters.uploaders")
 
 
 class AudioAwsUploader(AudioUploaderInterface):

@@ -7,7 +7,7 @@ from app.configs.settings import get_email_settings
 from app.interfaces import Page
 from app.services import AudioConverter
 
-logger = logging.getLogger("stdout")
+logger = logging.getLogger("app.webui.pages.audio")
 email_settings = get_email_settings()
 logger.debug(f"Email settings: {email_settings}")
 

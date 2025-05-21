@@ -11,7 +11,7 @@ Json: TypeAlias = str
 
 
 class BaseApi:
-    logger = logging.getLogger("stdout")
+    logger = logging.getLogger("app.drivers.api")
 
     def __init__(self, url: str):
         self.HEADERS = {"Content-Type": "application/json"}
