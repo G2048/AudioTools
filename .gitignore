@@ -174,3 +174,4 @@ gen
 *.mp3
 *.wav
 *.avi
+.zed/
