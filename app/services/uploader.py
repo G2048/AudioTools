@@ -5,10 +5,10 @@ from typing import Any, Self
 
 from app.aws import S3Bucket, S3Client
 from app.configs.settings import AwsBucketSettingsConfig, AwsSettingsConfig
-from app.interfaces import FileInterface, UploaderInterface
+from app.interfaces import IFile, IUploader
 
 
-class S3File(FileInterface):
+class S3File(IFile):
     def __init__(self, s3bucket: S3Bucket, file: str, file_path: str = "."):
         self.s3_bucket = s3bucket
         self.file_name = Path(file)
@@ -51,7 +51,7 @@ class S3File(FileInterface):
         return objects.get("Contents", [])
 
 
-class AwsUploader(UploaderInterface):
+class AwsUploader(IUploader):
     def __init__(
         self, aws_settings: AwsSettingsConfig, bucket_settings: AwsBucketSettingsConfig
     ):

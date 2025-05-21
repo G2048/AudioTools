@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class SenderInterface(ABC):
+class ISender(ABC):
     @property
     @abstractmethod
     def type(self) -> str:

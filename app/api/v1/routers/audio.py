@@ -3,12 +3,13 @@ import os
 import tempfile
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, UploadFile
+from pydantic import BaseModel
+
 from app.api.dependencies.auth import check_auth
 from app.api.dependencies.providers import get_providers, get_recognizer
 from app.api.models.audio import CheckStatusTaskID
-from app.interfaces.recognizers import RecognizedText, RecognizerInterface
-from fastapi import APIRouter, Depends, UploadFile
-from pydantic import BaseModel
+from app.interfaces.recognizers import IRecognizer, RecognizedText
 
 logger = logging.getLogger("app.api.v1.routers")
 router = APIRouter(
@@ -46,7 +47,7 @@ def mock_check_status_id(
 @router.post("/")
 def send_audio_for_transcription(
     audiofile: UploadFile,
-    provider: Annotated[RecognizerInterface, Depends(get_recognizer)],
+    provider: Annotated[IRecognizer, Depends(get_recognizer)],
 ) -> dict[str, str]:
     logger.debug(f"Type {audiofile.file=}")
     logger.debug(f"Type {audiofile.filename=}")
@@ -60,7 +61,7 @@ def send_audio_for_transcription(
 @router.get("/status/{task_id}")
 def check_status_id(
     task_id: str,
-    provider: Annotated[RecognizerInterface, Depends(get_recognizer)],
+    provider: Annotated[IRecognizer, Depends(get_recognizer)],
 ) -> CheckStatusTaskID:
     task_status = provider.check_status(task_id)
     return CheckStatusTaskID(
@@ -78,7 +79,7 @@ def write_to_temp_file(text: str) -> str:
 @router.get("/")
 def get_audio_transcription(
     task_id: str,
-    provider: Annotated[RecognizerInterface, Depends(get_recognizer)],
+    provider: Annotated[IRecognizer, Depends(get_recognizer)],
     # with_timestamp: bool = False,
 ) -> RecognizedText | None:
     logger.info(f"Download {task_id} file...")

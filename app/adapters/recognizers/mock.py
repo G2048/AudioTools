@@ -7,16 +7,16 @@ from typing import BinaryIO
 from app.interfaces.recognizers import (
     Chunk,
     File_id,
+    IRecognizedText,
+    IRecognizer,
     RecognizedText,
-    RecognizedTextInterface,
-    RecognizerInterface,
     Status,
 )
 
 logger = logging.getLogger("app.adapters.recognizers")
 
 
-class MockRecognizedText(RecognizedTextInterface):
+class MockRecognizedText(IRecognizedText):
     def get_ready_text(self) -> RecognizedText:
         processing_text = [
             Chunk(
@@ -31,7 +31,7 @@ class MockRecognizedText(RecognizedTextInterface):
         return RecognizedText(chunk_texts=processing_text)
 
 
-class MockRecognizer(RecognizerInterface):
+class MockRecognizer(IRecognizer):
     _tasks = {}
 
     def _create_task_id(self) -> str:

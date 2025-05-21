@@ -3,9 +3,10 @@ from datetime import datetime
 
 import gradio as gr
 import numpy as np
+
 from app.interfaces import (
-    AudioRecognizerInterface,
-    AudioUploaderInterface,
+    IAudioRecognizer,
+    IAudioUploader,
     Page,
     SenderInterface,
 )
@@ -18,8 +19,8 @@ class AudioTranscribePage(Page):
 
     def __init__(
         self,
-        uploader: AudioUploaderInterface,
-        recognizer: AudioRecognizerInterface,
+        uploader: IAudioUploader,
+        recognizer: IAudioRecognizer,
         sender: SenderInterface,
     ):
         self._audio_uploader = uploader

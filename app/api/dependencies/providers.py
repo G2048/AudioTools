@@ -3,12 +3,12 @@ from typing import Self
 from fastapi.exceptions import HTTPException
 
 from app.adapters.recognizers import mock, neural
-from app.interfaces.recognizers import RecognizerInterface
+from app.interfaces.recognizers import IRecognizer
 
 
 class Providers:
     __instance = None
-    __registered_fabric: dict[str, RecognizerInterface] = {}
+    __registered_fabric: dict[str, IRecognizer] = {}
 
     def __new__(cls) -> Self:
         if cls.__instance is None:
@@ -16,14 +16,14 @@ class Providers:
         return cls.__instance
 
     @classmethod
-    def register(cls, recognizer: RecognizerInterface):
+    def register(cls, recognizer: IRecognizer):
         cls.__registered_fabric[recognizer.name] = recognizer
 
     @classmethod
     def list(cls) -> list[str]:
         return list(cls.__registered_fabric.keys())
 
-    def __getattr__(self, name: str) -> RecognizerInterface:
+    def __getattr__(self, name: str) -> IRecognizer:
         if name in self.__registered_fabric:
             return self.__registered_fabric[name]
         raise AttributeError(f"No such attribute {name}")
@@ -41,7 +41,7 @@ def get_providers() -> list[str]:
     return recognizers_fabric.list()
 
 
-def get_recognizer(provider: str) -> RecognizerInterface:
+def get_recognizer(provider: str) -> IRecognizer:
     name = provider.lower()
     try:
         return recognizers_fabric[name]

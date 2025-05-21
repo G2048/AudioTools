@@ -26,7 +26,7 @@ class RecognizedText(BaseModel):
 # }
 
 
-class RecognizedTextInterface(ABC):
+class IRecognizedText(ABC):
     @abstractmethod
     def get_ready_text(self) -> RecognizedText:
         pass
@@ -46,7 +46,7 @@ class CheckStatusFileID(BaseModel):
     result: Any | None
 
 
-class RecognizerInterface(ABC):
+class IRecognizer(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
@@ -67,5 +67,5 @@ class RecognizerInterface(ABC):
         pass
 
     @abstractmethod
-    def download(self, task_id: Task_id) -> RecognizedTextInterface:
+    def download(self, task_id: Task_id) -> IRecognizedText:
         pass

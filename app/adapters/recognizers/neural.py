@@ -13,9 +13,9 @@ from transformers import Pipeline, pipeline
 from app.configs import get_neural_settings
 from app.interfaces.recognizers import (
     Chunk,
+    IRecognizedText,
+    IRecognizer,
     RecognizedText,
-    RecognizedTextInterface,
-    RecognizerInterface,
     Status,
 )
 
@@ -25,7 +25,7 @@ logger = logging.getLogger("app.adapters.recognizers")
 neural_settings = get_neural_settings()
 
 
-class NeuralRecognizedText(RecognizedTextInterface):
+class NeuralRecognizedText(IRecognizedText):
     def __init__(self, chunks: list, with_timestamp: bool = True) -> None:
         self.chunks = chunks
 
@@ -40,7 +40,7 @@ class NeuralRecognizedText(RecognizedTextInterface):
         return RecognizedText(chunk_texts=processing_text)
 
 
-class WhisperRecognizer(RecognizerInterface):
+class WhisperRecognizer(IRecognizer):
     __transcriber: Pipeline = pipeline(
         "automatic-speech-recognition", max_new_tokens=445, model=neural_settings.name
     )

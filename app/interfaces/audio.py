@@ -3,19 +3,19 @@ from enum import StrEnum
 from typing import BinaryIO
 
 
-class AudioUploaderInterface(ABC):
+class IAudioUploader(ABC):
     @abstractmethod
     def upload(self, file_path: str):
         pass
 
 
-# class AudioConverterInterface(ABC):
+# class IAudioConverter(ABC):
 #     @abstractmethod
 #     def convert(self, format: str):
 #         pass
 
 
-class AudioFilesInterfase(ABC):
+class IAudioFiles(ABC):
     @abstractmethod
     def create(self, format: str) -> dict[str, None]:
         pass
@@ -27,7 +27,7 @@ class AudioFormats(StrEnum):
     OGG = "ogg"
 
 
-class AudioFilesInterfase(ABC):
+class IAudioFiles(ABC):
     __slot__ = ("list_audio", "name", "path", "output_path")
 
     def __init__(self, file_path: str, output_path: str = "."):
@@ -41,8 +41,8 @@ class AudioFilesInterfase(ABC):
         self.list_audio.clear()
 
 
-class AudioConverterInterface(ABC):
-    def __init__(self, file: AudioFilesInterfase, format: AudioFormats):
+class IAudioConverter(ABC):
+    def __init__(self, file: IAudioFiles, format: AudioFormats):
         self.file = file
         self.format = format
         # self.file = output_file
@@ -83,7 +83,7 @@ class AudioConverterInterface(ABC):
 #             os.rename(old_audio_path, audio_path)
 #             self.logger.info(f"New audio file: {audio_path}")
 
-#         audio = AudioConverterInterface(audio_path, AudioFilesInterfase(audio_path))
+#         audio = IAudioConverter(audio_path, IAudioFiles(audio_path))
 
 #         if file_format not in ("mp3", "ogg"):
 #             audio = audio.convert(format)

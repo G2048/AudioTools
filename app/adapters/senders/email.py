@@ -3,14 +3,14 @@ import re
 
 from app.configs import get_email_settings
 from app.drivers import Email, EmailSender
-from app.interfaces import SenderInterface
+from app.interfaces import ISender
 
 logger = logging.getLogger("app.adapters.senders")
 email_settings = get_email_settings()
 logger.debug(f"Email settings: {email_settings}")
 
 
-class EmailSenderAdapter(SenderInterface):
+class EmailSenderAdapter(ISender):
     re_email = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
     email_message_template = """Здравствуйте!
     \nВаша расшифровка аудио запроса:
