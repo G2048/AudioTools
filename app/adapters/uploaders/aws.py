@@ -10,7 +10,7 @@ bucket_settings = get_aws_bucket_settings()
 logger = logging.getLogger("app.adapters.uploaders")
 
 
-class AudioAwsUploader(IAudioUploader):
+class AdapterAwsAudioUploader(IAudioUploader):
     __slot__ = "uploader"
 
     def __init__(self):

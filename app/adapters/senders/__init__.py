@@ -1,1 +1,1 @@
-from .email import EmailSenderAdapter
+from .email import AdapterEmailSender

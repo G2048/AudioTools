@@ -1,1 +1,1 @@
-from .aws import AudioAwsUploader
+from .aws import AdapterAwsAudioUploader

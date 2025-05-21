@@ -10,7 +10,7 @@ email_settings = get_email_settings()
 logger.debug(f"Email settings: {email_settings}")
 
 
-class EmailSenderAdapter(ISender):
+class AdapterEmailSender(ISender):
     re_email = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
     email_message_template = """Здравствуйте!
     \nВаша расшифровка аудио запроса:
@@ -22,6 +22,10 @@ class EmailSenderAdapter(ISender):
         self.sender = EmailSender(email_settings)
         self._email_message = None
         self.__parsed_emails = None
+
+    @property
+    def type(self) -> str:
+        return "email"
 
     # Test emails:
     # go@yandex.ru;print; urea@gmai l.com, so@ydex.ru;print; urea@gmail.com
@@ -51,10 +55,6 @@ class EmailSenderAdapter(ISender):
         g_emails = (Email(email, self._email_message) for email in emails)
         self.sender.execute(g_emails)
         return emails
-
-    @property
-    def type(self) -> str:
-        return "email"
 
     def check_input(self, recipients: str) -> tuple[str]:
         return self._checking_email(recipients)

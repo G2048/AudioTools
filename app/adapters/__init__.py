@@ -1,2 +1,2 @@
-from .senders import EmailSenderAdapter
-from .uploaders import AudioAwsUploader
+from .senders import AdapterEmailSender
+from .uploaders import AdapterAwsAudioUploader
