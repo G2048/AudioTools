@@ -2,11 +2,10 @@ import logging
 from http import HTTPStatus
 from typing import Annotated
 
+from app.services.jwt import JWT, ExpiredSignatureError, InvalidTokenError
 from fastapi import Depends, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer
-
-from app.services.jwt import JWT, ExpiredSignatureError, InvalidTokenError
 
 security = OAuth2PasswordBearer(tokenUrl="/api/v1/login/")
 

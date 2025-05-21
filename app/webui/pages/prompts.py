@@ -3,7 +3,6 @@ from collections import OrderedDict
 from dataclasses import dataclass
 
 import gradio as gr
-
 from app.interfaces import Page
 
 PROMPTS = OrderedDict(
@@ -71,7 +70,9 @@ class PromptsPage(Page):
         return "Загрузка Промптов"
 
     def filter_prompts(self):
-        self.prompts = OrderedDict(filter(lambda items: items[1][0] > 0, self.prompts.items()))
+        self.prompts = OrderedDict(
+            filter(lambda items: items[1][0] > 0, self.prompts.items())
+        )
 
     def do_prompt(self, name_prompt):
         prompt = PROMPTS[name_prompt]

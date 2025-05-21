@@ -1,6 +1,7 @@
 import logging
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Self, Sequence
+from typing import Any, Self
 
 from app.aws import S3Bucket, S3Client
 from app.configs.settings import AwsBucketSettingsConfig, AwsSettingsConfig
@@ -51,7 +52,9 @@ class S3File(FileInterface):
 
 
 class AwsUploader(UploaderInterface):
-    def __init__(self, aws_settings: AwsSettingsConfig, bucket_settings: AwsBucketSettingsConfig):
+    def __init__(
+        self, aws_settings: AwsSettingsConfig, bucket_settings: AwsBucketSettingsConfig
+    ):
         s3_client = S3Client(**aws_settings.model_dump())
         self.s3_bucket = S3Bucket(s3_client, bucket_settings.bucket_name)
         self._bucket_settings = bucket_settings

@@ -26,4 +26,6 @@ class S3Bucket:
     # Remove objects from bucket
     def delete_objects(self, object_names: list[dict]):
         # object_names = [{"Key": "object_name"}, {"Key": "script/py_script.py"}]
-        return self.s3_client.delete_objects(Bucket=self.bucket_name, Delete={"Objects": object_names})
+        return self.s3_client.delete_objects(
+            Bucket=self.bucket_name, Delete={"Objects": object_names}
+        )

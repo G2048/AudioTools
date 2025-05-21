@@ -3,16 +3,19 @@ import os
 import tempfile
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, UploadFile
-from pydantic import BaseModel
-
 from app.api.dependencies.auth import check_auth
 from app.api.dependencies.providers import get_providers, get_recognizer
 from app.api.models.audio import CheckStatusTaskID
 from app.interfaces.recognizers import RecognizedTexts, RecognizerInterface
+from fastapi import APIRouter, Depends, UploadFile
+from pydantic import BaseModel
 
 logger = logging.getLogger("stdout")
-router = APIRouter(prefix="/api/v1/audio", tags=["Audio Trinscribe"], dependencies=[Depends(check_auth)])
+router = APIRouter(
+    prefix="/api/v1/audio",
+    tags=["Audio Trinscribe"],
+    dependencies=[Depends(check_auth)],
+)
 
 
 # provider = recognizers_fabric["mock"]
@@ -31,7 +34,9 @@ async def get_available_recognizers(
 
 # Взять с помощью специального заголовка
 @router.get("/status/mock/{task_id}")
-def mock_check_status_id(task_id: str, client: str = Depends(get_recognizer)) -> CheckStatusTaskID:
+def mock_check_status_id(
+    task_id: str, client: str = Depends(get_recognizer)
+) -> CheckStatusTaskID:
     status, file_id = client.check_status(task_id)
     return CheckStatusTaskID(status=status, file_id=file_id)
 
@@ -58,7 +63,9 @@ def check_status_id(
     provider: Annotated[RecognizerInterface, Depends(get_recognizer)],
 ) -> CheckStatusTaskID:
     task_status = provider.check_status(task_id)
-    return CheckStatusTaskID(status=task_status["status"], file_id=task_status["file_id"])
+    return CheckStatusTaskID(
+        status=task_status["status"], file_id=task_status["file_id"]
+    )
 
 
 def write_to_temp_file(text: str) -> str:

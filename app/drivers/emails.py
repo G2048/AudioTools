@@ -1,10 +1,11 @@
 import logging
 import smtplib
 import ssl
+from collections.abc import Sequence
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
-from typing import Self, Sequence
+from typing import Self
 
 from app.configs.settings import EmailSettings
 

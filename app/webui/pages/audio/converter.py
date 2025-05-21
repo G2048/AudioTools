@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from datetime import datetime
 
 import gradio as gr
-
 from app.interfaces import Page
 from app.services import AudioConverter, AudioFiles
 
@@ -67,7 +66,9 @@ class AudioConverterPage(Page):
         )
 
     @staticmethod
-    def _convert_file(audio_path: str, format: str = "mp3", output_path: str = ".") -> str:
+    def _convert_file(
+        audio_path: str, format: str = "mp3", output_path: str = "."
+    ) -> str:
         logger.info(f"Conver file to {format} format")
         gr.Info(f"Конвертация aудио в {format}...")
         # hash_audio_file = hashlib.md5(audio_path.encode("utf-8")).hexdigest() + ".mp3"
@@ -116,8 +117,12 @@ class AudioConverterPage(Page):
             gr.Markdown("### Выберите формат аудио для конвертации")
             with gr.Row(equal_height=True, variant="panel"):
                 # check_boxs = self.__check_box_creator(self.audio_formats)
-                checkbox_mp3 = gr.Checkbox(label="mp3", info="Аудио будет преобразовано в mp3")
-                checkbox_wav = gr.Checkbox(label="wav", info="Аудио будет преобразовано в wav")
+                checkbox_mp3 = gr.Checkbox(
+                    label="mp3", info="Аудио будет преобразовано в mp3"
+                )
+                checkbox_wav = gr.Checkbox(
+                    label="wav", info="Аудио будет преобразовано в wav"
+                )
 
             audio_input = gr.Audio(
                 interactive=True,

@@ -99,7 +99,9 @@ class RouterFilter(logging.Filter):
     endpoints = ("/metrics", "/health")
 
     def filter(self, record) -> bool:
-        return record.args is None or (not len(record.args) > 2 and record.args[2] in self.endpoints)
+        return record.args is None or (
+            not len(record.args) > 2 and record.args[2] in self.endpoints
+        )
 
 
 LogConfig = {

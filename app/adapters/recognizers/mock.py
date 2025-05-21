@@ -53,8 +53,13 @@ class MockRecognizer(RecognizerInterface):
     def send(self, audio_file: BinaryIO) -> str:
         task_id = self._create_task_id()
         # Write to DB status processing of file_id
-        self._tasks[task_id] = {"status": Status.PROCESSING, "file_id": self._create_file_id()}
-        thread_task = threading.Thread(target=self._imitation_task, args=(task_id,), daemon=True)
+        self._tasks[task_id] = {
+            "status": Status.PROCESSING,
+            "file_id": self._create_file_id(),
+        }
+        thread_task = threading.Thread(
+            target=self._imitation_task, args=(task_id,), daemon=True
+        )
         thread_task.start()
         logger.info(f"Create task_id: {task_id}")
         return task_id

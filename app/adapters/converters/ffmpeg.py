@@ -3,9 +3,8 @@ import os
 from pathlib import Path
 
 import numpy as np
-from pydub import AudioSegment
-
 from app.interfaces.audio import AudioConverterInterface
+from pydub import AudioSegment
 
 logger = logging.getLogger("stdout")
 
@@ -14,7 +13,9 @@ class AudioConverter(AudioConverterInterface):
     def __init__(self, file: str, output_path: str = "/tmp/"):
         self.output_path = Path(output_path)
         if not self.output_path.exists():
-            raise FileNotFoundError(f"The output path {self.output_path} does not exist")
+            raise FileNotFoundError(
+                f"The output path {self.output_path} does not exist"
+            )
 
         self.current_file = Path(file)
         self._format = self.current_file.suffix
@@ -68,11 +69,15 @@ class AudioConverter(AudioConverterInterface):
         return audio.convert_from_numpy(audio)
 
     @staticmethod
-    def match_target_amplitude(sound: AudioSegment, target_dBFS: int | float = -20) -> AudioSegment:
+    def match_target_amplitude(
+        sound: AudioSegment, target_dBFS: int | float = -20
+    ) -> AudioSegment:
         change_in_dBFS = target_dBFS - sound.dBFS
         return sound.apply_gain(change_in_dBFS)
 
-    def to_numpy(self, crop_min: float = 0, crop_max: float = 100) -> tuple[int, np.ndarray]:
+    def to_numpy(
+        self, crop_min: float = 0, crop_max: float = 100
+    ) -> tuple[int, np.ndarray]:
         if crop_min != 0 or crop_max != 100:
             audio_start = len(self.segment) * crop_min / 100
             audio_end = len(self.segment) * crop_max / 100

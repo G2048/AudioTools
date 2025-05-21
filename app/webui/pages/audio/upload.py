@@ -2,7 +2,6 @@ import logging
 import os
 
 import gradio as gr
-
 from app.adapters import AudioAwsUploader
 from app.configs.settings import get_email_settings
 from app.interfaces import Page
@@ -88,13 +87,16 @@ class AudioUploadPage(Page):
             )
             with gr.Row(equal_height=True, variant="panel"):
                 gr.Radio(
-                    ["mp3", "wav"], label="Форматы аудио", info="Выберите формат аудио для загрузки в облако"
+                    ["mp3", "wav"],
+                    label="Форматы аудио",
+                    info="Выберите формат аудио для загрузки в облако",
                 )
                 # checbox_mp3 = gr.Checkbox(label="mp3", info="Аудио будет преобразовано в mp3")
                 # checbox_wav = gr.Checkbox(label="wav", info="Аудио будет преобразовано в wav")
             with gr.Row(equal_height=True, variant="panel"):
                 checbox_speed = gr.Checkbox(
-                    label="Быстро", info="Если выбрано, то будет увеличена скорость загрузки аудио"
+                    label="Быстро",
+                    info="Если выбрано, то будет увеличена скорость загрузки аудио",
                 )
                 time_text = gr.Textbox(
                     lines=1,
@@ -108,7 +110,9 @@ class AudioUploadPage(Page):
                 size="lg",
                 variant="primary",
             )
-            start_button.click(fn=self.__do, inputs=[audio_input, checbox_speed], outputs=time_text)
+            start_button.click(
+                fn=self.__do, inputs=[audio_input, checbox_speed], outputs=time_text
+            )
 
             # audio_input.change(
             #     inputs=audio_input, outputs=text_output, fn=lambda x: f"Audio changed to {x}"

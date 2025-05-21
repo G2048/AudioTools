@@ -2,12 +2,11 @@ import logging
 from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestFormStrict
-
 from app.api.dependencies.auth import check_auth
 from app.api.models.users import Token
 from app.services.jwt import JWT, JwtPayload
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestFormStrict
 
 router = APIRouter(
     prefix="/api/v1/login",

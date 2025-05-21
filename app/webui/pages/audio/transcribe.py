@@ -3,7 +3,6 @@ from datetime import datetime
 
 import gradio as gr
 import numpy as np
-
 from app.interfaces import (
     AudioRecognizerInterface,
     AudioUploaderInterface,
@@ -79,7 +78,9 @@ class AudioTranscribePage(Page):
         ) as app:
             gr.Markdown("# Transcribe audio")
 
-            gr.Markdown(f"### Укажите {self._sender.type}'ы для отправки расшифрованного аудио")
+            gr.Markdown(
+                f"### Укажите {self._sender.type}'ы для отправки расшифрованного аудио"
+            )
             with gr.Row(equal_height=True, variant="panel"):
                 with gr.Column(scale=1):
                     text_title = gr.Textbox(
@@ -100,7 +101,8 @@ class AudioTranscribePage(Page):
             )
             with gr.Row(equal_height=True, variant="panel"):
                 checbox_speed = gr.Checkbox(
-                    label="Быстро", info="Если выбрано, то будет увеличена скорость загрузки аудио"
+                    label="Быстро",
+                    info="Если выбрано, то будет увеличена скорость загрузки аудио",
                 )
                 time_text = gr.Textbox(
                     lines=1,
@@ -115,7 +117,9 @@ class AudioTranscribePage(Page):
                 variant="primary",
             )
             start_button.click(
-                fn=self.__do, inputs=[audio_input, text_title, checbox_speed], outputs=time_text
+                fn=self.__do,
+                inputs=[audio_input, text_title, checbox_speed],
+                outputs=time_text,
             )
 
         return app

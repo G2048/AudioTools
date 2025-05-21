@@ -7,9 +7,6 @@ from tempfile import NamedTemporaryFile
 from typing import BinaryIO
 
 import numpy as np
-from pydub import AudioSegment
-from transformers import Pipeline, pipeline
-
 from app.configs import get_neural_settings
 from app.interfaces.recognizers import (
     RecognizedText,
@@ -18,6 +15,8 @@ from app.interfaces.recognizers import (
     RecognizerInterface,
     Status,
 )
+from pydub import AudioSegment
+from transformers import Pipeline, pipeline
 
 logger = logging.getLogger("stdout")
 
@@ -59,17 +58,26 @@ class WhisperRecognizer(RecognizerInterface):
 
     def send(self, audio_file: BinaryIO) -> str:
         task_id = self._create_task_id()
-        self._TASKS[task_id] = {"status": Status.PROCESSING, "file_id": self._create_file_id()}
+        self._TASKS[task_id] = {
+            "status": Status.PROCESSING,
+            "file_id": self._create_file_id(),
+        }
         logger.info(f"Create task for Neural {self.name}: {task_id}")
 
         tmp_audio_file = self._create_tmp_file(audio_file)
         # audio_array = self.binay_io_to_numpy(audio_file)
-        thread_task = threading.Thread(target=self._transcribe, args=(tmp_audio_file, task_id), daemon=True)
+        thread_task = threading.Thread(
+            target=self._transcribe, args=(tmp_audio_file, task_id), daemon=True
+        )
         thread_task.start()
         return task_id
 
     def check_status(self, task_id: str) -> dict[str, str]:
-        return self._TASKS.get(task_id, None) or {"status": Status.NONE, "file_id": "", "text": ""}
+        return self._TASKS.get(task_id, None) or {
+            "status": Status.NONE,
+            "file_id": "",
+            "text": "",
+        }
 
     def download(self, task_id: str) -> NeuralRecognizedText:
         task_info = self._TASKS.get(task_id)
@@ -130,7 +138,9 @@ class WhisperRecognizer(RecognizerInterface):
         y = y.astype(np.float32)
         y /= np.max(np.abs(y))
         try:
-            transcribed_text = self.__transcriber({"sampling_rate": sr, "raw": y}, return_timestamps=True)
+            transcribed_text = self.__transcriber(
+                {"sampling_rate": sr, "raw": y}, return_timestamps=True
+            )
         except Exception as e:
             self._TASKS[task_id]["status"] = Status.ERROR
             logger.error(f"Error While transcribing: {e}")
