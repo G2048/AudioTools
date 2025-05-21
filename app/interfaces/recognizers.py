@@ -18,18 +18,10 @@ class Chunk(BaseModel):
 
 class RecognizedText(BaseModel):
     chunk_texts: list[Chunk]
-
-
-# {
-#     text: "some text",
-#     timestamps: ("00:00:00", "00:00:01"),
-# }
-
-
-class IRecognizedText(ABC):
-    @abstractmethod
-    def get_ready_text(self) -> RecognizedText:
-        pass
+    # {
+    #     text: "some text",
+    #     timestamps: ("00:00:00", "00:00:01"),
+    # }
 
 
 class Status(StrEnum):
@@ -65,5 +57,5 @@ class IRecognizer(ABC):
         pass
 
     @abstractmethod
-    def download(self, task_id: Task_id) -> IRecognizedText:
+    def download(self, task_id: Task_id) -> RecognizedText:
         pass

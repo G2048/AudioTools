@@ -7,28 +7,12 @@ from typing import BinaryIO
 from app.interfaces.recognizers import (
     Chunk,
     File_id,
-    IRecognizedText,
     IRecognizer,
     RecognizedText,
     Status,
 )
 
 logger = logging.getLogger("app.adapters.recognizers")
-
-
-class MockRecognizedText(IRecognizedText):
-    def get_ready_text(self) -> RecognizedText:
-        processing_text = [
-            Chunk(
-                timestamps=("0:00:00", "0:00:10"),
-                text="Lore Ipsum",
-            ),
-            Chunk(
-                timestamps=("0:00:10", "0:00:20"),
-                text="Dolor Sit Amet",
-            ),
-        ]
-        return RecognizedText(chunk_texts=processing_text)
 
 
 class MockRecognizer(IRecognizer):
@@ -67,5 +51,15 @@ class MockRecognizer(IRecognizer):
     def check_status(self, task_id: str) -> dict[Status, File_id]:
         return self._tasks.get(task_id) or {"status": Status.NONE, "file_id": ""}
 
-    def download(self, task_id: str) -> MockRecognizedText:
-        return MockRecognizedText()
+    def download(self, task_id: str) -> RecognizedText:
+        processing_text = [
+            Chunk(
+                timestamps=("0:00:00", "0:00:10"),
+                text="Lore Ipsum",
+            ),
+            Chunk(
+                timestamps=("0:00:10", "0:00:20"),
+                text="Dolor Sit Amet",
+            ),
+        ]
+        return RecognizedText(chunk_texts=processing_text)

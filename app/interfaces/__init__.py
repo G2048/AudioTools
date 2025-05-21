@@ -3,7 +3,6 @@ from .files import IFile, IUploader
 from .iam import ImTokenInterface
 from .recognizers import (
     Chunk,
-    IRecognizedText,
     IRecognizer,
     RecognizedText,
 )

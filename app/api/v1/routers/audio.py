@@ -72,17 +72,4 @@ def get_audio_transcription(
     # with_timestamp: bool = False,
 ) -> RecognizedText | None:
     logger.info(f"Download {task_id} file...")
-    recognized_text = provider.download(task_id)
-    if recognized_text is None:
-        return
-
-    return recognized_text.get_ready_text()
-    # path = write_to_temp_file(recognized_text.get_ready_text(with_timestamp))
-    # path = write_to_temp_file(recognized_text.get_ready_text())
-    # remove_task = partial(os.remove, path)
-    # return FileResponse(
-    #     path=path,
-    #     media_type="text/text",
-    #     background=BackgroundTask(remove_task),
-    #     status_code=HTTPStatus.OK,
-    # )
+    return provider.download(task_id)

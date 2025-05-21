@@ -14,7 +14,6 @@ from app.drivers.neurals.whisper import NeuralException, Whisper
 from app.interfaces.recognizers import (
     CheckStatusFileID,
     Chunk,
-    IRecognizedText,
     IRecognizer,
     RecognizedText,
     Status,
@@ -24,21 +23,6 @@ logger = logging.getLogger("app.adapters.recognizers")
 
 # LLMMODEL = "./whisper-large-v3"
 neural_settings = get_neural_settings()
-
-
-class NeuralRecognizedText(IRecognizedText):
-    def __init__(self, chunks: list, with_timestamp: bool = True) -> None:
-        self.chunks = chunks
-
-    def get_ready_text(self) -> RecognizedText:
-        processing_text = [
-            Chunk(
-                timestamps=(str(chunk["timestamp"][0]), str(chunk["timestamp"][1])),
-                text=chunk["text"].removeprefix(" "),
-            )
-            for chunk in self.chunks
-        ]
-        return RecognizedText(chunk_texts=processing_text)
 
 
 class WhisperRecognizer(IRecognizer):
@@ -78,10 +62,20 @@ class WhisperRecognizer(IRecognizer):
             return CheckStatusFileID(status=Status.NONE, file_id="", text="")
         return CheckStatusFileID(**status_info)
 
-    def download(self, task_id: str) -> NeuralRecognizedText:
+    def download(self, task_id: str) -> RecognizedText | None:
         task_info = self._TASKS.get(task_id)
         if task_info and task_info["status"] == Status.SUCCESS:
-            return NeuralRecognizedText(task_info["text"]["chunks"])
+            return self._processing_text(task_info["text"]["chunks"])
+
+    def _processing_text(self, chunks: list) -> RecognizedText:
+        processing_text = [
+            Chunk(
+                timestamps=(str(chunk["timestamp"][0]), str(chunk["timestamp"][1])),
+                text=chunk["text"].removeprefix(" "),
+            )
+            for chunk in chunks
+        ]
+        return RecognizedText(chunk_texts=processing_text)
 
     @staticmethod
     def binay_io_to_numpy(binary_io: BinaryIO) -> np.ndarray:
