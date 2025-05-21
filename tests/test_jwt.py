@@ -10,6 +10,12 @@ class TestJwt(unittest.TestCase):
     def tearDown(self) -> None:
         return super().tearDown()
 
+    def test_JwtPayload(self):
+        test_token = JwtPayload(sub="test")
+        self.assertIsNotNone(test_token)
+        self.assertIsInstance(test_token, JwtPayload)
+        self.assertNotEqual(test_token, JwtPayload(sub="test"))
+
     def test_generate_token(self):
         test_token = self.client.generate_token(JwtPayload(sub="test"))
         self.assertIsNotNone(test_token)
