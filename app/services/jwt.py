@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+from typing import Optional
+from uuid import UUID, uuid4
 
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
-from pydantic import BaseModel, ConfigDict, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field
 
 from app.configs.settings import JwtSettings
 
@@ -12,6 +14,7 @@ class JwtPayload(BaseModel):
 
     sub: str
     ttl: int = 900
+    jti: UUID = Field(default_factory=uuid4)
 
     @computed_field(return_type=int)
     def exp(self):
@@ -21,6 +24,12 @@ class JwtPayload(BaseModel):
     @computed_field(return_type=int)
     def iat(self):
         return int(datetime.now().timestamp())
+
+
+class JwtRefreshTokenPayload(JwtPayload):
+    version: int
+    user_agent: Optional[str] = "curl"
+    ttl: int = 30 * 24 * 60 * 60  # 30 days in seconds
 
 
 class JWT:
