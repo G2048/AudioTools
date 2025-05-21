@@ -5,10 +5,10 @@ import uuid
 from typing import BinaryIO
 
 from app.interfaces.recognizers import (
+    Chunk,
     File_id,
     RecognizedText,
     RecognizedTextInterface,
-    RecognizedTexts,
     RecognizerInterface,
     Status,
 )
@@ -17,18 +17,18 @@ logger = logging.getLogger("app.adapters.recognizers")
 
 
 class MockRecognizedText(RecognizedTextInterface):
-    def get_ready_text(self) -> RecognizedTexts:
+    def get_ready_text(self) -> RecognizedText:
         processing_text = [
-            RecognizedText(
+            Chunk(
                 timestamps=("0:00:00", "0:00:10"),
                 text="Lore Ipsum",
             ),
-            RecognizedText(
+            Chunk(
                 timestamps=("0:00:10", "0:00:20"),
                 text="Dolor Sit Amet",
             ),
         ]
-        return RecognizedTexts(chunk_texts=processing_text)
+        return RecognizedText(chunk_texts=processing_text)
 
 
 class MockRecognizer(RecognizerInterface):

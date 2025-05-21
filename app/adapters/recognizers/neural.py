@@ -7,16 +7,17 @@ from tempfile import NamedTemporaryFile
 from typing import BinaryIO
 
 import numpy as np
+from pydub import AudioSegment
+from transformers import Pipeline, pipeline
+
 from app.configs import get_neural_settings
 from app.interfaces.recognizers import (
+    Chunk,
     RecognizedText,
     RecognizedTextInterface,
-    RecognizedTexts,
     RecognizerInterface,
     Status,
 )
-from pydub import AudioSegment
-from transformers import Pipeline, pipeline
 
 logger = logging.getLogger("app.adapters.recognizers")
 
@@ -28,15 +29,15 @@ class NeuralRecognizedText(RecognizedTextInterface):
     def __init__(self, chunks: list, with_timestamp: bool = True) -> None:
         self.chunks = chunks
 
-    def get_ready_text(self) -> RecognizedTexts:
+    def get_ready_text(self) -> RecognizedText:
         processing_text = [
-            RecognizedText(
+            Chunk(
                 timestamps=(str(chunk["timestamp"][0]), str(chunk["timestamp"][1])),
                 text=chunk["text"].removeprefix(" "),
             )
             for chunk in self.chunks
         ]
-        return RecognizedTexts(chunk_texts=processing_text)
+        return RecognizedText(chunk_texts=processing_text)
 
 
 class WhisperRecognizer(RecognizerInterface):

@@ -4,17 +4,20 @@ from typing import Any, BinaryIO, TypeAlias
 
 from pydantic import BaseModel
 
-Start_Time: TypeAlias = str
-End_Time: TypeAlias = str
+Task_id: TypeAlias = str
+File_id: TypeAlias = str
+
+StartTime: TypeAlias = str
+EndTime: TypeAlias = str
 
 
-class RecognizedText(BaseModel):
-    timestamps: tuple[Start_Time, End_Time]
+class Chunk(BaseModel):
+    timestamps: tuple[StartTime, EndTime]
     text: str
 
 
-class RecognizedTexts(BaseModel):
-    chunk_texts: list[RecognizedText]
+class RecognizedText(BaseModel):
+    chunk_texts: list[Chunk]
 
 
 # {
@@ -25,7 +28,7 @@ class RecognizedTexts(BaseModel):
 
 class RecognizedTextInterface(ABC):
     @abstractmethod
-    def get_ready_text(self) -> RecognizedTexts:
+    def get_ready_text(self) -> RecognizedText:
         pass
 
 
@@ -35,10 +38,6 @@ class Status(StrEnum):
     SUCCESS = "SUCCESS"
     ERROR = "ERROR"
     NONE = "NONE"
-
-
-Task_id: TypeAlias = str
-File_id: TypeAlias = str
 
 
 class CheckStatusFileID(BaseModel):

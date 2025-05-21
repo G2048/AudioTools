@@ -6,7 +6,7 @@ from typing import Annotated
 from app.api.dependencies.auth import check_auth
 from app.api.dependencies.providers import get_providers, get_recognizer
 from app.api.models.audio import CheckStatusTaskID
-from app.interfaces.recognizers import RecognizedTexts, RecognizerInterface
+from app.interfaces.recognizers import RecognizedText, RecognizerInterface
 from fastapi import APIRouter, Depends, UploadFile
 from pydantic import BaseModel
 
@@ -80,7 +80,7 @@ def get_audio_transcription(
     task_id: str,
     provider: Annotated[RecognizerInterface, Depends(get_recognizer)],
     # with_timestamp: bool = False,
-) -> RecognizedTexts | None:
+) -> RecognizedText | None:
     logger.info(f"Download {task_id} file...")
     recognized_text = provider.download(task_id)
     if recognized_text is None:
