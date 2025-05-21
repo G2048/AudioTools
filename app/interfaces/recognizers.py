@@ -42,7 +42,7 @@ class Status(StrEnum):
 
 class CheckStatusFileID(BaseModel):
     status: Status
-    file_id: File_id | None
+    file_id: File_id
     result: Any | None
 
 

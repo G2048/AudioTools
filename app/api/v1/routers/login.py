@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestFormStrict
 
 from app.api.dependencies.auth import check_auth
-from app.api.models.users import Token
+from app.api.models.users import ResponseToken
 from app.api.services.jwt import JWT, JwtPayload
 
 router = APIRouter(
@@ -25,7 +25,7 @@ security = OAuth2PasswordBearer(tokenUrl="/api/v1/login/")
 
 
 @router.post("/")
-def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> Token:
+def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> ResponseToken:
     logger.debug(f"Body: {body=}")
     username = body.username.partition("@")[0]
     logged_in = registre_user(username, body.password)
@@ -36,7 +36,7 @@ def login(body: Annotated[OAuth2PasswordRequestFormStrict, Depends()]) -> Token:
             detail="Incorrect username or password",
         )
     token = JWT.generate_token(JwtPayload(sub=username))
-    return Token(access_token=token, token_type="bearer")
+    return ResponseToken(access_token=token, token_type="bearer")
 
 
 @router.get("/")

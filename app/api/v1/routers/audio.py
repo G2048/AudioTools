@@ -6,7 +6,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, UploadFile
 
 from app.api.dependencies import check_auth, get_providers, get_recognizer
-from app.api.models.audio import AvailableRecognizers, CheckStatusTaskID
+from app.api.models.audio import ResponseAvailableRecognizers, ResponseStatus
 from app.interfaces.recognizers import IRecognizer, RecognizedText
 
 logger = logging.getLogger("app.api.v1.routers")
@@ -17,23 +17,20 @@ router = APIRouter(
 )
 
 
-# provider = recognizers_fabric["mock"]
-
-
-@router.get("/providers", response_model=AvailableRecognizers)
+@router.get("/providers", response_model=ResponseAvailableRecognizers)
 async def get_available_recognizers(
     providers: Annotated[list[str], Depends(get_providers)],
-) -> AvailableRecognizers:
-    return AvailableRecognizers(providers=providers)
+) -> ResponseAvailableRecognizers:
+    return ResponseAvailableRecognizers(providers=providers)
 
 
 # Взять с помощью специального заголовка
 @router.get("/status/mock/{task_id}")
 def mock_check_status_id(
     task_id: str, client: IRecognizer = Depends(get_recognizer)
-) -> CheckStatusTaskID:
+) -> ResponseStatus:
     file_status = client.check_status(task_id)
-    return CheckStatusTaskID(status=file_status.status, file_id=file_status.file_id)
+    return ResponseStatus(status=file_status.status, file_id=file_status.file_id)
 
 
 # TODO: Здесь нужно сделать выбор распознавателя на уровне клиента api
@@ -56,11 +53,9 @@ def send_audio_for_transcription(
 def check_status_id(
     task_id: str,
     provider: Annotated[IRecognizer, Depends(get_recognizer)],
-) -> CheckStatusTaskID:
+) -> ResponseStatus:
     task_status = provider.check_status(task_id)
-    return CheckStatusTaskID(
-        status=task_status["status"], file_id=task_status["file_id"]
-    )
+    return ResponseStatus(status=task_status.status, file_id=task_status.file_id)
 
 
 def write_to_temp_file(text: str) -> str:

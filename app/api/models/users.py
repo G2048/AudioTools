@@ -17,6 +17,6 @@ class UserLogin(BaseModel):
         return f"grant_type={self.grant_type}&&username={self.username}&password={self.password}"
 
 
-class Token(BaseModel):
+class ResponseToken(BaseModel):
     access_token: str
     token_type: str
