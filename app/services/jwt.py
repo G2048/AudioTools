@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
@@ -9,12 +9,16 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field
 from app.configs.settings import JwtSettings
 
 
+def uuid_str_factory() -> str:
+    return str(uuid4())
+
+
 class JwtPayload(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     sub: str
     ttl: int = 900
-    jti: UUID = Field(default_factory=uuid4)
+    jti: str = Field(default_factory=uuid_str_factory)
 
     @computed_field(return_type=int)
     def exp(self):
