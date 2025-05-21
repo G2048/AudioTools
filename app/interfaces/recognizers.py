@@ -61,9 +61,7 @@ class IRecognizer(ABC):
         pass
 
     @abstractmethod
-    def check_status(
-        self, task_id: Task_id
-    ) -> CheckStatusFileID | dict[Status, File_id]:
+    def check_status(self, task_id: Task_id) -> CheckStatusFileID:
         pass
 
     @abstractmethod

@@ -12,6 +12,7 @@ from transformers import Pipeline, pipeline
 
 from app.configs import get_neural_settings
 from app.interfaces.recognizers import (
+    CheckStatusFileID,
     Chunk,
     IRecognizedText,
     IRecognizer,
@@ -73,12 +74,11 @@ class WhisperRecognizer(IRecognizer):
         thread_task.start()
         return task_id
 
-    def check_status(self, task_id: str) -> dict[str, str]:
-        return self._TASKS.get(task_id, None) or {
-            "status": Status.NONE,
-            "file_id": "",
-            "text": "",
-        }
+    def check_status(self, task_id: str) -> CheckStatusFileID:
+        status_info = self._TASKS.get(task_id, None)
+        if status_info is None:
+            return CheckStatusFileID(status=Status.NONE, file_id="", text="")
+        return CheckStatusFileID(**status_info)
 
     def download(self, task_id: str) -> NeuralRecognizedText:
         task_info = self._TASKS.get(task_id)

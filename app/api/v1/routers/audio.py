@@ -4,11 +4,9 @@ import tempfile
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, UploadFile
-from pydantic import BaseModel
 
-from app.api.dependencies.auth import check_auth
-from app.api.dependencies.providers import get_providers, get_recognizer
-from app.api.models.audio import CheckStatusTaskID
+from app.api.dependencies import check_auth, get_providers, get_recognizer
+from app.api.models.audio import AvailableRecognizers, CheckStatusTaskID
 from app.interfaces.recognizers import IRecognizer, RecognizedText
 
 logger = logging.getLogger("app.api.v1.routers")
@@ -22,10 +20,6 @@ router = APIRouter(
 # provider = recognizers_fabric["mock"]
 
 
-class AvailableRecognizers(BaseModel):
-    providers: list[str]
-
-
 @router.get("/providers", response_model=AvailableRecognizers)
 async def get_available_recognizers(
     providers: Annotated[list[str], Depends(get_providers)],
@@ -36,10 +30,10 @@ async def get_available_recognizers(
 # Взять с помощью специального заголовка
 @router.get("/status/mock/{task_id}")
 def mock_check_status_id(
-    task_id: str, client: str = Depends(get_recognizer)
+    task_id: str, client: IRecognizer = Depends(get_recognizer)
 ) -> CheckStatusTaskID:
-    status, file_id = client.check_status(task_id)
-    return CheckStatusTaskID(status=status, file_id=file_id)
+    file_status = client.check_status(task_id)
+    return CheckStatusTaskID(status=file_status.status, file_id=file_status.file_id)
 
 
 # TODO: Здесь нужно сделать выбор распознавателя на уровне клиента api
