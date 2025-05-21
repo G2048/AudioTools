@@ -16,7 +16,6 @@ class _ParserPyproject:
         _prev_manager = None
         for key in manager.value.split("."):
             self._manager = self._pyproject_toml.get(key, {})
-            print(f"{self._manager=}")
             if self._manager:
                 _prev_manager = self._manager
             else:
