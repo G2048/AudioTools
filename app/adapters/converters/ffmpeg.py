@@ -3,13 +3,14 @@ import os
 from pathlib import Path
 
 import numpy as np
-from app.interfaces.audio import AudioConverterInterface
 from pydub import AudioSegment
+
+from app.interfaces.audio import IAudioConverter
 
 logger = logging.getLogger("app.adapters.converters")
 
 
-class AudioConverter(AudioConverterInterface):
+class AudioConverter(IAudioConverter):
     def __init__(self, file: str, output_path: str = "/tmp/"):
         self.output_path = Path(output_path)
         if not self.output_path.exists():
