@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class ImTokenInterface(ABC):
+class IAccessToken(ABC):
     @abstractmethod
     def get_token(self) -> str:
         pass

@@ -1,6 +1,6 @@
 from .audio import IAudioUploader
 from .files import IFile, IUploader
-from .iam import ImTokenInterface
+from .oauth import IAccessToken
 from .recognizers import (
     Chunk,
     IRecognizer,
