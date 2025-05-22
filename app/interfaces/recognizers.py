@@ -49,7 +49,7 @@ class IRecognizer(ABC):
         pass
 
     @abstractmethod
-    def send(self, audio_file: BinaryIO) -> Task_id:
+    def send(self, file: BinaryIO, format: str) -> Task_id:
         pass
 
     @abstractmethod
