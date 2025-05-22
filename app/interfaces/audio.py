@@ -9,12 +9,6 @@ class IAudioUploader(ABC):
         pass
 
 
-# class IAudioConverter(ABC):
-#     @abstractmethod
-#     def convert(self, format: str):
-#         pass
-
-
 class IAudioFiles(ABC):
     @abstractmethod
     def create(self, format: str) -> dict[str, None]:
@@ -27,29 +21,9 @@ class AudioFormats(StrEnum):
     OGG = "ogg"
 
 
-class IAudioFiles(ABC):
-    __slot__ = ("list_audio", "name", "path", "output_path")
-
-    def __init__(self, file_path: str, output_path: str = "."):
-        # name without extension
-        self._file = Path(file_path)
-        self.name = self._file.stem
-        self.list_audio: dict[str, None] = {}
-        self.output_path = output_path
-
-    def clean(self):
-        self.list_audio.clear()
-
-
 class IAudioConverter(ABC):
-    def __init__(self, file: IAudioFiles, format: AudioFormats):
-        self.file = file
-        self.format = format
-        # self.file = output_file
-        # self.file_path = file_path
-
     @abstractmethod
-    def convert(self, file: BinaryIO | str) -> str:
+    def convert(self, file: BinaryIO) -> str:
         pass
 
 
