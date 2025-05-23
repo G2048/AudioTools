@@ -58,27 +58,28 @@ class FFmpegConverter:
             )
 
         self._file = Path(file)
-        self._format = self._file.suffix
+        self._format = self._file.suffix.replace(".", "")
         self.segment = AudioSegment.from_file(file, self._format)
+        # AudioSegment.from_raw()
 
     @property
-    def format(self):
-        return self._file.suffix
+    def format(self) -> str:
+        return self._format
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._file
 
     @property
-    def channels(self):
+    def channels(self) -> int:
         return self.segment.channels
 
     @property
-    def size(self):
+    def size(self) -> int:
         return os.path.getsize(self._file)
 
     @property
-    def duration(self):
+    def duration(self) -> float:
         return self.segment.duration_seconds
 
     def convert_mp3(self):
@@ -90,15 +91,15 @@ class FFmpegConverter:
     def convert_wav(self):
         return self.convert("wav")
 
-    def _new_path(self, format: str) -> str:
-        return os.path.join(self.output_path, f"{self._file}.{format}")
+    def new_path(self, format: str) -> str:
+        return os.path.join(self.output_path, f"{self._file.stem}.{format}")
 
     def convert(self, format="wav", increase_volume: bool = True):
         logger.info(f"Converting the {self._file} file to {format}")
         try:
             # -ac 1 is option that convert audio to 1 channel
             output_after_converting = self.segment.export(
-                self._new_path(format),
+                self.new_path(format),
                 format=format,
                 parameters=["-ac", "1"],
             )
