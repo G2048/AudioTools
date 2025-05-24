@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import StrEnum
-from typing import Any, BinaryIO, TypeAlias
+from typing import BinaryIO, Optional, TypeAlias
 
 from pydantic import BaseModel
 
@@ -12,16 +12,12 @@ EndTime: TypeAlias = str
 
 
 class Chunk(BaseModel):
-    timestamps: tuple[StartTime, EndTime]
     text: str
+    timestamps: tuple[StartTime, EndTime]
 
 
 class RecognizedText(BaseModel):
-    chunk_texts: list[Chunk]
-    # {
-    #     text: "some text",
-    #     timestamps: ("00:00:00", "00:00:01"),
-    # }
+    chunks: list[Chunk]
 
 
 class Status(StrEnum):
@@ -32,10 +28,9 @@ class Status(StrEnum):
     NONE = "NONE"
 
 
-class CheckStatusFileID(BaseModel):
-    status: Status
-    file_id: File_id
-    result: Any | None = None
+class StatusFile(BaseModel):
+    status: Status = Status.NONE
+    file_id: Optional[File_id] = None
 
 
 class IRecognizer(ABC):
@@ -45,17 +40,13 @@ class IRecognizer(ABC):
         pass
 
     @abstractmethod
-    def _create_task_id(self) -> Task_id:
-        pass
-
-    @abstractmethod
     def send(self, file: BinaryIO, format: str) -> Task_id:
         pass
 
     @abstractmethod
-    def check_status(self, task_id: Task_id) -> CheckStatusFileID:
+    def check_status(self, task_id: Task_id) -> StatusFile:
         pass
 
     @abstractmethod
-    def download(self, task_id: Task_id) -> RecognizedText:
+    def download(self, task_id: Task_id) -> RecognizedText | None:
         pass

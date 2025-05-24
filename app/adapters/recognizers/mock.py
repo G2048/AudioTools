@@ -6,17 +6,18 @@ from typing import BinaryIO
 
 from app.interfaces.recognizers import (
     Chunk,
-    File_id,
     IRecognizer,
     RecognizedText,
     Status,
+    StatusFile,
+    Task_id,
 )
 
 logger = logging.getLogger("app.adapters.recognizers")
 
 
 class MockRecognizer(IRecognizer):
-    _tasks = {}
+    _tasks: dict[Task_id, StatusFile] = {}
 
     def _create_task_id(self) -> str:
         return uuid.uuid1().hex
@@ -31,16 +32,16 @@ class MockRecognizer(IRecognizer):
 
     def _imitation_task(self, task_id: str) -> None:
         time.sleep(10)
-        self._tasks[task_id]["status"] = Status.SUCCESS
+        self._tasks[task_id].status = Status.SUCCESS
         logger.info(f"Task_id {task_id} is done")
 
-    def send(self, audio_file: BinaryIO) -> str:
+    def send(self, file: BinaryIO, format: str) -> Task_id:
         task_id = self._create_task_id()
         # Write to DB status processing of file_id
-        self._tasks[task_id] = {
-            "status": Status.PROCESSING,
-            "file_id": self._create_file_id(),
-        }
+        self._tasks[task_id] = StatusFile(
+            status=Status.PROCESSING,
+            file_id=self._create_file_id(),
+        )
         thread_task = threading.Thread(
             target=self._imitation_task, args=(task_id,), daemon=True
         )
@@ -48,8 +49,8 @@ class MockRecognizer(IRecognizer):
         logger.info(f"Create task_id: {task_id}")
         return task_id
 
-    def check_status(self, task_id: str) -> dict[Status, File_id]:
-        return self._tasks.get(task_id) or {"status": Status.NONE, "file_id": ""}
+    def check_status(self, task_id: str) -> StatusFile:
+        return self._tasks.get(task_id) or StatusFile()
 
     def download(self, task_id: str) -> RecognizedText:
         processing_text = [
@@ -62,4 +63,4 @@ class MockRecognizer(IRecognizer):
                 text="Dolor Sit Amet",
             ),
         ]
-        return RecognizedText(chunk_texts=processing_text)
+        return RecognizedText(chunks=processing_text)
