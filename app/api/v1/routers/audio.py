@@ -6,15 +6,19 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, UploadFile
 
 from app.api.dependencies import check_auth, get_providers, get_recognizer
-from app.api.models.audio import ResponseAvailableRecognizers, ResponseStatus
+from app.api.models.audio import (
+    ResponseAvailableRecognizers,
+    ResponseStatus,
+    ResponseTaskId,
+)
 from app.interfaces.recognizers import IRecognizer, RecognizedText
 
-logger = logging.getLogger("app.api.v1.routers")
 router = APIRouter(
     prefix="/api/v1/audio",
     tags=["Audio Trinscribe"],
     dependencies=[Depends(check_auth)],
 )
+logger = logging.getLogger("app.api.v1.routers")
 
 
 @router.get("/providers", response_model=ResponseAvailableRecognizers)
@@ -39,13 +43,13 @@ def mock_check_status_id(
 def send_audio_for_transcription(
     audiofile: UploadFile,
     provider: Annotated[IRecognizer, Depends(get_recognizer)],
-) -> dict[str, str]:
+) -> ResponseTaskId:
     logger.debug(f"Type {audiofile.file=}")
     logger.debug(f"Type {audiofile.filename=}")
     # with open(audiofile.file, "rb") as f:
     audiofile.name = audiofile.filename
     task_id = provider.send(audiofile.file)
-    return {"task_id": task_id}
+    return ResponseTaskId(task_id=task_id)
 
 
 # TODO: здесь нужно придумать какую-то фабрику....
@@ -65,6 +69,8 @@ def write_to_temp_file(text: str) -> str:
     return path
 
 
+# TODO: реализовать получение текста на почту.
+# В идеале получение текста должно быть запрошено при расознавании
 @router.get("/")
 def get_audio_transcription(
     task_id: str,
