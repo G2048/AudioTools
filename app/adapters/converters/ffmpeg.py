@@ -7,28 +7,30 @@ from app.services.audio import FFmpegConverter
 logger = logging.getLogger("app.adapters.converters")
 
 
-class Mp3Converter(IAudioConverter):
+class MixinConverter(IAudioConverter):
     __slots__ = ()
+    _format = ""
+
+    @property
+    def format(self) -> str:
+        return self._format
 
     def convert(self, file: BinaryIO) -> str:
         converter = FFmpegConverter(file.name)
-        segment = converter.convert_mp3()
+        segment = converter.convert(self._format)
         return segment.name
 
 
-class WavConverter(IAudioConverter):
+class Mp3Converter(MixinConverter):
     __slots__ = ()
-
-    def convert(self, file: BinaryIO) -> str:
-        converter = FFmpegConverter(file.name)
-        segment = converter.convert_wav()
-        return segment.name
+    _format = "mp3"
 
 
-class OggConverter(IAudioConverter):
+class WavConverter(MixinConverter):
     __slots__ = ()
+    _format = "wav"
 
-    def convert(self, file: BinaryIO) -> str:
-        converter = FFmpegConverter(file.name)
-        segment = converter.convert_ogg()
-        return segment.name
+
+class OggConverter(MixinConverter):
+    __slots__ = ()
+    _format = "ogg"
