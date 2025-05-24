@@ -106,8 +106,6 @@ class WhisperRecognizer(IRecognizer):
             audio_end = len(audio) * crop_max / 100
             audio = audio[audio_start:audio_end]
         data = np.array(audio.get_array_of_samples())
-        print(f"Audio data: {data=}")
-        print(f"Length: {len(data)=}")
         if audio.channels > 1:
             data = data.reshape(-1, audio.channels)
 
