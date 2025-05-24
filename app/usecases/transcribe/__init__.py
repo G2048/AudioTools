@@ -1,1 +1,1 @@
-from .recognize import SendRecognizeUseCase
+from .recognize import AudioRecognitionError, RecognitionError, SendRecognizeUseCase
