@@ -16,7 +16,7 @@ class ResponseStatus(BaseModel):
 
 
 class ResponseAvailableRecognizers(BaseModel):
-    providers: list[str]
+    recognizers: list[str]
 
 
 class ResponseTaskId(BaseModel):

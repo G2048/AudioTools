@@ -6,7 +6,7 @@ from app.interfaces.recognizers import IRecognizer
 recognizers_fabric = Providers()
 
 
-def get_providers() -> list[str]:
+def get_recognizers() -> list[str]:
     return recognizers_fabric.list()
 
 

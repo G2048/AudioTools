@@ -5,7 +5,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, UploadFile
 
-from app.api.dependencies import check_auth, get_providers, get_recognizer
+from app.api.dependencies import check_auth, get_recognizer, get_recognizers
 from app.api.models.audio import (
     ResponseAvailableRecognizers,
     ResponseStatus,
@@ -21,11 +21,11 @@ router = APIRouter(
 logger = logging.getLogger("app.api.v1.routers")
 
 
-@router.get("/providers", response_model=ResponseAvailableRecognizers)
+@router.get("/recognizers", response_model=ResponseAvailableRecognizers)
 async def get_available_recognizers(
-    providers: Annotated[list[str], Depends(get_providers)],
+    recognizers: Annotated[list[str], Depends(get_recognizers)],
 ) -> ResponseAvailableRecognizers:
-    return ResponseAvailableRecognizers(providers=providers)
+    return ResponseAvailableRecognizers(recognizers=recognizers)
 
 
 # Взять с помощью специального заголовка
@@ -42,14 +42,14 @@ def mock_check_status_id(
 @router.post("/")
 def send_audio_for_transcription(
     audiofile: UploadFile,
-    provider: Annotated[IRecognizer, Depends(get_recognizer)],
+    recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
 ) -> ResponseTaskId:
     logger.debug(f"Type {audiofile.file=}")
     logger.debug(f"Type {audiofile.filename=}")
     # with open(audiofile.file, "rb") as f:
     audiofile.name = audiofile.filename
     FORMAT = "mp3"
-    task_id = provider.send(audiofile.file, FORMAT)
+    task_id = recognizer.send(audiofile.file, FORMAT)
     return ResponseTaskId(task_id=task_id)
 
 
@@ -57,9 +57,9 @@ def send_audio_for_transcription(
 @router.get("/status/{task_id}")
 def check_status_id(
     task_id: str,
-    provider: Annotated[IRecognizer, Depends(get_recognizer)],
+    recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
 ) -> ResponseStatus:
-    task_status = provider.check_status(task_id)
+    task_status = recognizer.check_status(task_id)
     return ResponseStatus(status=task_status.status, file_id=task_status.file_id)
 
 
@@ -75,8 +75,8 @@ def write_to_temp_file(text: str) -> str:
 @router.get("/")
 def get_audio_transcription(
     task_id: str,
-    provider: Annotated[IRecognizer, Depends(get_recognizer)],
+    recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
     # with_timestamp: bool = False,
 ) -> RecognizedText | None:
     logger.info(f"Download {task_id} file...")
-    return provider.download(task_id)
+    return recognizer.download(task_id)
