@@ -7,4 +7,3 @@ from .recognizers import (
     RecognizedText,
 )
 from .senders import ISender
-from .storages import HashedFile, IHasher, IStorage
