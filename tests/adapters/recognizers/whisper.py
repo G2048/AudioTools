@@ -1,10 +1,12 @@
 import os
 import time
 import unittest
+from typing import BinaryIO
 from unittest.mock import MagicMock
 
 import numpy as np
 
+from app.adapters.converters.ffmpeg import WavConverter
 from app.adapters.recognizers.neural import WhisperRecognizer
 from app.interfaces.recognizers import (
     Chunk,
@@ -59,13 +61,23 @@ class TestWhisperRecognizer(unittest.TestCase):
         self.assertIsInstance(sample_rate, int)
         self.assertIsInstance(np_array, np.ndarray)
 
+    def convert_audio(self, audio_file: BinaryIO):
+        converter = WavConverter()
+        return converter.convert(audio_file)
+
     def test_recognize(self):
         fd = open(TEST_AUDIO_FILE, "rb")
+        new_file = self.convert_audio(fd)
+        fd.close()
+        fd = open(new_file, "rb")
         try:
+            print(f"File descriptor is closed: {fd.closed}")
+            self.assertFalse(fd.closed, "File NOT MUST be closed")
             task_id = self.recognizer.send(fd, FORMAT)
             print(f"Current task id: {task_id}")
             self.assertIsInstance(task_id, Task_id)
 
+            self.assertFalse(fd.closed, "File NOT MUST be closed")
             status_file = self.recognizer.check_status(task_id)
             print(f"{status_file=}")
             self.assertIsInstance(status_file, StatusFile)
@@ -73,10 +85,16 @@ class TestWhisperRecognizer(unittest.TestCase):
             self.assertEqual(status_file.status, Status.PROCESSING)
             self.assertIsNotNone(status_file.file_id)
 
+            self.assertFalse(fd.closed, "File NOT MUST be closed")
             while status_file.status != Status.SUCCESS:
+                self.assertFalse(fd.closed, "File NOT MUST be closed")
                 status_file = self.recognizer.check_status(task_id)
                 time.sleep(1)
                 print(f"Current status: {status_file.status}")
+                if status_file.status == Status.ERROR:
+                    raise Exception
+
+            self.assertFalse(fd.closed, "File NOT MUST be closed")
             recognized_text = self.recognizer.download(task_id)
             self.assertIsNotNone(recognized_text)
             self.assertIsInstance(recognized_text, RecognizedText)
