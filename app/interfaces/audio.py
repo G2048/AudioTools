@@ -22,6 +22,11 @@ class AudioFormats(StrEnum):
 
 
 class IAudioConverter(ABC):
+    @property
+    @abstractmethod
+    def format(self) -> str:
+        pass
+
     @abstractmethod
     def convert(self, file: BinaryIO) -> str:
         pass
