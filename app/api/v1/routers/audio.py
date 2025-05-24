@@ -3,9 +3,12 @@ import os
 import tempfile
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends
 
 from app.api.dependencies import check_auth, get_recognizer, get_recognizers
+from app.api.dependencies.adapters.recoginze import (
+    AdapterSendRecognizeUseCase,
+)
 from app.api.models.audio import (
     ResponseAvailableRecognizers,
     ResponseStatus,
@@ -41,15 +44,11 @@ def mock_check_status_id(
 # Сделать выбор распознавателя в виде enum
 @router.post("/")
 def send_audio_for_transcription(
-    audiofile: UploadFile,
-    recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
+    usecase: Annotated[
+        AdapterSendRecognizeUseCase, Depends(AdapterSendRecognizeUseCase)
+    ],
 ) -> ResponseTaskId:
-    logger.debug(f"Type {audiofile.file=}")
-    logger.debug(f"Type {audiofile.filename=}")
-    # with open(audiofile.file, "rb") as f:
-    audiofile.name = audiofile.filename
-    FORMAT = "mp3"
-    task_id = recognizer.send(audiofile.file, FORMAT)
+    task_id = usecase.execute()
     return ResponseTaskId(task_id=task_id)
 
 
