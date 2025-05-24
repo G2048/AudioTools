@@ -48,7 +48,8 @@ def send_audio_for_transcription(
     logger.debug(f"Type {audiofile.filename=}")
     # with open(audiofile.file, "rb") as f:
     audiofile.name = audiofile.filename
-    task_id = provider.send(audiofile.file)
+    FORMAT = "mp3"
+    task_id = provider.send(audiofile.file, FORMAT)
     return ResponseTaskId(task_id=task_id)
 
 
