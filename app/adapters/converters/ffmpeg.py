@@ -34,3 +34,17 @@ class WavConverter(MixinConverter):
 class OggConverter(MixinConverter):
     __slots__ = ()
     _format = "ogg"
+
+
+class ConverterFactory:
+    __slots__ = ()
+
+    def get_converter(self, format: str) -> IAudioConverter:
+        if format == "mp3":
+            return Mp3Converter()
+        elif format == "wav":
+            return WavConverter()
+        elif format == "ogg":
+            return OggConverter()
+        else:
+            raise ValueError(f"Unknown format {format}")
