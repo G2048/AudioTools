@@ -74,6 +74,16 @@ class JwtSettings(BaseSettings):
     algorithm: str = "HS256"
 
 
+class RedisIpcConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="REDIS_")
+
+    host: str = "localhost"
+    port: int = 6379
+    db: int = 0
+    password: Optional[str] = None
+    ssl: bool = False
+
+
 _app_settings = AppSettings()
 
 
@@ -108,3 +118,7 @@ def get_neural_settings() -> NeuralSettings:
 
 def get_jwt_settings() -> JwtSettings:
     return JwtSettings()
+
+
+def get_redis_ipc_settings() -> RedisIpcConfig:
+    return RedisIpcConfig()
