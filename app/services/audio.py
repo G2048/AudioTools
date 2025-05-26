@@ -50,6 +50,13 @@ class AudioInfo:
 
 
 class FFmpegConverter:
+    # See for more info: https://ffmpeg.org/ffmpeg-formats.html
+    _FILE_FORMATS: dict[str, str] = {
+        "wma": "asf",
+        "opus": "ogg",
+    }
+    CHANNELS = "1"
+
     def __init__(self, file: str, output_path: str = "/tmp/"):
         self.output_path = Path(output_path)
         if not self.output_path.exists():
@@ -58,7 +65,8 @@ class FFmpegConverter:
             )
 
         self._file = Path(file)
-        self._format = self._file.suffix.replace(".", "")
+        _format = self._file.suffix.replace(".", "")
+        self._format: str = self._FILE_FORMATS.get(_format, _format)
         self.segment = AudioSegment.from_file(file, self._format)
         # AudioSegment.from_raw()
 
@@ -101,7 +109,7 @@ class FFmpegConverter:
             output_after_converting = self.segment.export(
                 self.new_path(format),
                 format=format,
-                parameters=["-ac", "1"],
+                parameters=["-ac", self.CHANNELS],
             )
             new_name = output_after_converting.name
             output_after_converting.close()
