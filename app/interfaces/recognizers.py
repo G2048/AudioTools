@@ -11,7 +11,7 @@ File_id: TypeAlias = str
 StartTime: TypeAlias = str
 EndTime: TypeAlias = str
 
-AUDIOFORMAT: Literal["wav"]
+AUDIOFORMAT: Literal["wav"] = "wav"
 
 
 class Chunk(BaseModel):
