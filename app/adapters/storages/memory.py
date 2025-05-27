@@ -37,7 +37,7 @@ class RedisTaskStorage(ITaskStorage):
         logger.info(f"Get Task_id: {task_id}")
         message = self.redis.get(task_id)
         if message.value is None:
-            raise TaskIdNotFoundError(f"Task with id {task_id} not found")
+            raise TaskIdNotFoundError(f"Task_id: {task_id} not found")
         else:
             value = json.loads(message.value)
             logger.debug(f"Response TaskMessage: {value}")
