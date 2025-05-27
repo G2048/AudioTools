@@ -8,14 +8,14 @@ from fastapi.exceptions import HTTPException
 
 from app.adapters.converters.ffmpeg import ConverterFactory
 from app.api.dependencies import get_recognizer
-from app.interfaces.recognizers import IRecognizer, Task_id
+from app.interfaces.recognizers import AUDIOFORMAT, IRecognizer, Task_id
 from app.usecases.transcribe import RecognitionError, SendRecognizeUseCase
 
 logger = logging.getLogger("app.api.dependencies.adapters")
 
 
 class AdapterSendRecognizeUseCase(SendRecognizeUseCase):
-    FORMAT = "wav"
+    FORMAT = AUDIOFORMAT
 
     def __init__(
         self,

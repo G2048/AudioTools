@@ -3,12 +3,15 @@ from enum import StrEnum
 from typing import BinaryIO, Optional, TypeAlias
 
 from pydantic import BaseModel
+from typing_extensions import Literal
 
 Task_id: TypeAlias = str
 File_id: TypeAlias = str
 
 StartTime: TypeAlias = str
 EndTime: TypeAlias = str
+
+AUDIOFORMAT: Literal["wav"]
 
 
 class Chunk(BaseModel):
