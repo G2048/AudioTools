@@ -2,25 +2,28 @@ import json
 import logging
 
 from app.configs.settings import get_redis_ipc_settings
-from app.drivers.ipc.redis_ipc import RedisIPC, RedisMessage
+from app.drivers.ipc.redis_ipc import RedisException, RedisIPC, RedisMessage
 from app.interfaces.storages import ITaskStorage, Task_id, TaskMessage, TTLTaskId
 
 logger = logging.getLogger("app.adapters.storages")
 
 
-class Storage(Exception):
-    pass
-
-
-class TaskIdNotFoundError(Storage):
+class StorageException(Exception):
     def __init__(self, detail: str):
         self.detail = detail
 
 
+class TaskIdNotFoundError(StorageException):
+    pass
+
+
 class RedisTaskStorage(ITaskStorage):
     def __init__(self):
-        self.redis = RedisIPC(get_redis_ipc_settings())
-        assert self.redis.ping(), "Redis is not available"
+        try:
+            self.redis = RedisIPC(get_redis_ipc_settings())
+            self.redis.ping()
+        except RedisException as e:
+            raise StorageException(e.detail)
 
     def set(self, message: TaskMessage) -> bool:
         logger.info(f"Set Task_id: {message.task_id} -> {message.recognizer}")
