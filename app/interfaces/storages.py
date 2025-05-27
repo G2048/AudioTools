@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from .recognizers import File_id, Task_id
 
-TTLTaskId: int = 300
+TTLTaskId: int = 1800  # 30 minutes
 
 
 class TaskMessage(BaseModel):
