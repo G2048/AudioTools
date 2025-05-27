@@ -3,6 +3,7 @@ from typing import Any, Optional
 
 import redis
 from pydantic import BaseModel
+from redis.exceptions import ConnectionError
 
 from app.configs.settings import RedisIpcConfig
 
@@ -19,7 +20,11 @@ class RedisMessage(BaseModel):
 
 
 class RedisException(Exception):
-    pass
+    detail = "Redis Exception"
+
+
+class ConnectionUnavailable(RedisException):
+    detail = "Redis is not available"
 
 
 class TTLNotProvided(RedisException):
@@ -86,4 +91,7 @@ class RedisIPC:
         return self.redis.info()
 
     def ping(self):
-        return self.redis.ping()
+        try:
+            return self.redis.ping()
+        except ConnectionError as e:
+            raise ConnectionUnavailable(e)
