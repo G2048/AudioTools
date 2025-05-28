@@ -27,3 +27,7 @@ class ITaskStorage(ABC):
     @abstractmethod
     def get(self, task_id: Task_id) -> TaskMessage | None:
         pass
+
+    @abstractmethod
+    def list(self) -> list[TaskMessage] | None:
+        pass
