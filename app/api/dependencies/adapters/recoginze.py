@@ -7,8 +7,9 @@ from fastapi import Depends, UploadFile
 from fastapi.exceptions import HTTPException
 
 from app.adapters.converters.ffmpeg import ConverterFactory
-from app.api.dependencies import get_recognizer
+from app.api.dependencies import get_recognizer, get_task_storage
 from app.interfaces.recognizers import AUDIOFORMAT, IRecognizer, Task_id
+from app.interfaces.storages import ITaskStorage
 from app.usecases.transcribe import RecognitionError, SendRecognizeUseCase
 
 logger = logging.getLogger("app.api.dependencies.adapters")
@@ -21,15 +22,16 @@ class AdapterSendRecognizeUseCase(SendRecognizeUseCase):
         self,
         audiofile: UploadFile,
         recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
+        storage: Annotated[ITaskStorage, Depends(get_task_storage)],
     ):
-        self.recognizer = recognizer
-        self._converter = ConverterFactory().get_converter(self.FORMAT)
+        converter = ConverterFactory().get_converter(self.FORMAT)
         logger.info(f"Upload audiofile: {audiofile.filename}")
         logger.debug(f"Type {audiofile.filename=}")
         self.audiofile = self._create_temp_file(audiofile)
         super().__init__(
-            recognizer=self.recognizer,
-            audio_converter=self._converter,
+            recognizer=recognizer,
+            audio_converter=converter,
+            storage=storage,
         )
 
     def _create_temp_file(self, audiofile: UploadFile):
