@@ -17,7 +17,7 @@ class JwtPayload(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     sub: str
-    ttl: int = 900
+    ttl: int = 900 * 60 * 24 * 30  # 30 days
     jti: str = Field(default_factory=uuid_str_factory)
 
     @computed_field(return_type=int)
