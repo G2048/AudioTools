@@ -10,6 +10,7 @@ from app.adapters.storages.memory import StorageException
 from app.api.dependencies import (
     check_auth,
     get_recognizer,
+    get_recognizer_by_task_id,
     get_recognizers,
     get_task_storage,
 )
@@ -51,8 +52,7 @@ def mock_check_status_id(
     return ResponseStatus(status=file_status.status, file_id=file_status.file_id)
 
 
-# TODO: Здесь нужно сделать выбор распознавателя на уровне клиента api
-# Сделать выбор распознавателя в виде enum
+# TODO: Сделать выбор распознавателя в виде enum
 @router.post("/", tags=["Audio Recognition"])
 def send_audio_for_transcription(
     usecase: Annotated[
@@ -63,11 +63,10 @@ def send_audio_for_transcription(
     return ResponseTaskId(task_id=task_id)
 
 
-# TODO: здесь нужно придумать какую-то фабрику....
 @router.get("/status/{task_id}", tags=["Audio Recognition"])
 def check_status_id(
     task_id: Task_id,
-    recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
+    recognizer: Annotated[IRecognizer, Depends(get_recognizer_by_task_id)],
 ) -> ResponseStatus:
     task_status = recognizer.check_status(task_id)
     return ResponseStatus(status=task_status.status, file_id=task_status.file_id)
@@ -85,7 +84,7 @@ def write_to_temp_file(text: str) -> str:
 @router.get("/", tags=["Audio Recognition"])
 def get_audio_transcription(
     task_id: Task_id,
-    recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
+    recognizer: Annotated[IRecognizer, Depends(get_recognizer_by_task_id)],
     # with_timestamp: bool = False,
 ) -> RecognizedText | None:
     logger.info(f"Download {task_id} file...")
