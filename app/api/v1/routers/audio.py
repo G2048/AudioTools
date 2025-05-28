@@ -1,7 +1,7 @@
 import logging
 import os
 import tempfile
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
@@ -52,11 +52,12 @@ def mock_check_status_id(
     return ResponseStatus(status=file_status.status, file_id=file_status.file_id)
 
 
-# TODO: Сделать выбор распознавателя в виде enum
 @router.post("/", tags=["Audio Recognition"])
 def send_audio_for_transcription(
+    recognizer: Literal[*get_recognizers()],
     usecase: Annotated[
-        AdapterSendRecognizeUseCase, Depends(AdapterSendRecognizeUseCase)
+        AdapterSendRecognizeUseCase,
+        Depends(AdapterSendRecognizeUseCase),
     ],
 ) -> ResponseTaskId:
     task_id = usecase.execute()
