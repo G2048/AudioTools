@@ -2,17 +2,17 @@ import time
 import unittest
 
 from app.configs.settings import get_redis_ipc_settings
-from app.drivers.ipc.redis.storages import (
+from app.drivers.ipc.redis import (
     ConnectionUnavailable,
     DeleteStatus,
     DictStore,
     HashStore,
     RedisConnection,
+    RedisMessage,
     SetStore,
     SortedSet,
     SortedSetStore,
 )
-from app.drivers.ipc.redis_ipc import RedisMessage
 
 
 class TestRedisConnection(unittest.TestCase):
@@ -265,7 +265,9 @@ class TesSortedSetStore(unittest.TestCase):
         )
         self.assertTrue(success)
         store_all = self.store.all(self.message.key)
-        self.assertIsInstance(store_all, list)
+        self.assertIsNotNone(store_all)
+        self.assertIsInstance(store_all, SortedSet)
+        self.assertIsInstance(store_all.pairs, list)
         print(f"Store all: {store_all=}")
 
     @unittest.skip("Not implementing the .get()")
