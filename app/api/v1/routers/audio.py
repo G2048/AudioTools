@@ -4,8 +4,15 @@ import tempfile
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from fastapi.exceptions import HTTPException
 
-from app.api.dependencies import check_auth, get_recognizer, get_recognizers
+from app.adapters.storages.memory import StorageException
+from app.api.dependencies import (
+    check_auth,
+    get_recognizer,
+    get_recognizers,
+    get_task_storage,
+)
 from app.api.dependencies.adapters.recoginze import (
     AdapterSendRecognizeUseCase,
 )
@@ -14,7 +21,8 @@ from app.api.models.audio import (
     ResponseStatus,
     ResponseTaskId,
 )
-from app.interfaces.recognizers import IRecognizer, RecognizedText
+from app.interfaces.recognizers import IRecognizer, RecognizedText, Task_id
+from app.interfaces.storages import ITaskStorage, TaskMessage
 
 router = APIRouter(
     prefix="/api/v1/audio",
@@ -79,3 +87,24 @@ def get_audio_transcription(
 ) -> RecognizedText | None:
     logger.info(f"Download {task_id} file...")
     return recognizer.download(task_id)
+
+
+@router.get("/tasks/")
+def get_list_tasks(
+    storage: Annotated[ITaskStorage, Depends(get_task_storage)],
+) -> list[TaskMessage] | None:
+    try:
+        return storage.list()
+    except StorageException as e:
+        raise HTTPException(status_code=404, detail=e.detail)
+
+
+@router.get("/tasks/{task_id}")
+def get_task_recognition(
+    task_id: Task_id,
+    storage: Annotated[ITaskStorage, Depends(get_task_storage)],
+) -> TaskMessage | None:
+    try:
+        return storage.get(task_id)
+    except StorageException as e:
+        raise HTTPException(status_code=404, detail=e.detail)
