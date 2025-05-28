@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel
 
-from .recognizers import File_id, Task_id
+from .recognizers import AUDIOFORMAT, File_id, Task_id
 
 TTLTaskId: int = 1800  # 30 minutes
 
@@ -10,7 +10,7 @@ TTLTaskId: int = 1800  # 30 minutes
 class TaskMessage(BaseModel):
     task_id: Task_id
     recognizer: str
-    format: str = "wav"
+    format: str = AUDIOFORMAT
     file_id: File_id
 
     def model_dump_json(self, *args, **kwargs):
