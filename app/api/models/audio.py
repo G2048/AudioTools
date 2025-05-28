@@ -2,16 +2,16 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from app.interfaces.recognizers import File_id, Task_id
+from app.interfaces.recognizers import File_id, Status, Task_id
 
 
 class Audio(BaseModel):
-    status: str
+    status: Status
     file_id: File_id
 
 
 class ResponseStatus(BaseModel):
-    status: str
+    status: Status
     file_id: Optional[File_id] = None
 
 
