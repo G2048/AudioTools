@@ -175,3 +175,4 @@ gen
 *.wav
 *.avi
 .zed/
+.minio-storage/

@@ -1,6 +1,6 @@
 services:
   transcriber:
-    # image: sever-audio:1.0.0
+    image: sever-audio:1.0.0
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,3 +11,21 @@ services:
       - .env
     ports:
       - 8000:8080
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - 9000:9000 # API
+      - 9001:9001 # WebUI
+    volumes:
+      - .minio-storage:/data
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minioroot
+    command: server --console-address ":9001" /data/
+
+  storage:
+    image: redis
+    ports:
+      - 6379:6379
