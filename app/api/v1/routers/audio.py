@@ -26,13 +26,16 @@ from app.interfaces.storages import ITaskStorage, TaskMessage
 
 router = APIRouter(
     prefix="/api/v1/audio",
-    tags=["Audio Trinscribe"],
     dependencies=[Depends(check_auth)],
 )
 logger = logging.getLogger("app.api.v1.routers")
 
 
-@router.get("/recognizers", response_model=ResponseAvailableRecognizers)
+@router.get(
+    "/recognizers",
+    tags=["Audio Recognition"],
+    response_model=ResponseAvailableRecognizers,
+)
 async def get_available_recognizers(
     recognizers: Annotated[list[str], Depends(get_recognizers)],
 ) -> ResponseAvailableRecognizers:
@@ -40,7 +43,7 @@ async def get_available_recognizers(
 
 
 # Взять с помощью специального заголовка
-@router.get("/status/mock/{task_id}")
+@router.get("/status/mock/{task_id}", tags=["Audio Mock"])
 def mock_check_status_id(
     task_id: str, client: IRecognizer = Depends(get_recognizer)
 ) -> ResponseStatus:
@@ -50,7 +53,7 @@ def mock_check_status_id(
 
 # TODO: Здесь нужно сделать выбор распознавателя на уровне клиента api
 # Сделать выбор распознавателя в виде enum
-@router.post("/")
+@router.post("/", tags=["Audio Recognition"])
 def send_audio_for_transcription(
     usecase: Annotated[
         AdapterSendRecognizeUseCase, Depends(AdapterSendRecognizeUseCase)
@@ -61,7 +64,7 @@ def send_audio_for_transcription(
 
 
 # TODO: здесь нужно придумать какую-то фабрику....
-@router.get("/status/{task_id}")
+@router.get("/status/{task_id}", tags=["Audio Recognition"])
 def check_status_id(
     task_id: str,
     recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
@@ -79,7 +82,7 @@ def write_to_temp_file(text: str) -> str:
 
 # TODO: реализовать получение текста на почту.
 # В идеале получение текста должно быть запрошено при расознавании
-@router.get("/")
+@router.get("/", tags=["Audio Recognition"])
 def get_audio_transcription(
     task_id: str,
     recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
@@ -89,7 +92,7 @@ def get_audio_transcription(
     return recognizer.download(task_id)
 
 
-@router.get("/tasks/")
+@router.get("/tasks/", tags=["Audio Tasks"])
 def get_list_tasks(
     storage: Annotated[ITaskStorage, Depends(get_task_storage)],
 ) -> list[TaskMessage] | None:
@@ -99,7 +102,7 @@ def get_list_tasks(
         raise HTTPException(status_code=404, detail=e.detail)
 
 
-@router.get("/tasks/{task_id}")
+@router.get("/tasks/{task_id}", tags=["Audio Tasks"])
 def get_task_recognition(
     task_id: Task_id,
     storage: Annotated[ITaskStorage, Depends(get_task_storage)],
