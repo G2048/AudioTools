@@ -191,6 +191,11 @@ LogConfig = {
             "level": LOG_LEVEL,
             "propagate": False,
         },
+        "python_multipart.multipart": {
+            "handlers": [],  # Remove unnecessary noises
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
     },
 }
 
