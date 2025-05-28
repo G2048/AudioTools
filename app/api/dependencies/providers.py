@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
@@ -17,9 +17,9 @@ def get_recognizers() -> list[str]:
 
 
 def get_recognizer(
-    provider: str,
+    recognizer: Literal[*get_recognizers()],
 ) -> IRecognizer:
-    name = provider.lower()
+    name = recognizer.lower()
     try:
         return recognizers_fabric[name]
     except AttributeError:

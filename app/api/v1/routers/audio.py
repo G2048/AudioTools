@@ -54,7 +54,6 @@ def mock_check_status_id(
 
 @router.post("/", tags=["Audio Recognition"])
 def send_audio_for_transcription(
-    recognizer: Literal[*get_recognizers()],
     usecase: Annotated[
         AdapterSendRecognizeUseCase,
         Depends(AdapterSendRecognizeUseCase),
