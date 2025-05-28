@@ -45,7 +45,7 @@ async def get_available_recognizers(
 # Взять с помощью специального заголовка
 @router.get("/status/mock/{task_id}", tags=["Audio Mock"])
 def mock_check_status_id(
-    task_id: str, client: IRecognizer = Depends(get_recognizer)
+    task_id: Task_id, client: IRecognizer = Depends(get_recognizer)
 ) -> ResponseStatus:
     file_status = client.check_status(task_id)
     return ResponseStatus(status=file_status.status, file_id=file_status.file_id)
@@ -66,7 +66,7 @@ def send_audio_for_transcription(
 # TODO: здесь нужно придумать какую-то фабрику....
 @router.get("/status/{task_id}", tags=["Audio Recognition"])
 def check_status_id(
-    task_id: str,
+    task_id: Task_id,
     recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
 ) -> ResponseStatus:
     task_status = recognizer.check_status(task_id)
@@ -84,7 +84,7 @@ def write_to_temp_file(text: str) -> str:
 # В идеале получение текста должно быть запрошено при расознавании
 @router.get("/", tags=["Audio Recognition"])
 def get_audio_transcription(
-    task_id: str,
+    task_id: Task_id,
     recognizer: Annotated[IRecognizer, Depends(get_recognizer)],
     # with_timestamp: bool = False,
 ) -> RecognizedText | None:
