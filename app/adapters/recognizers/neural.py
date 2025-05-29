@@ -12,11 +12,14 @@ from app.configs import get_neural_settings
 from app.drivers.neurals.whisper import NeuralException, Whisper
 from app.interfaces.recognizers import (
     Chunk,
+    IRecognitionStorage,
     IRecognizer,
     RecognizedText,
     Status,
     StatusFile,
     Task_id,
+    TaskIdStatus,
+    classproperty,
 )
 
 logger = logging.getLogger("app.adapters.recognizers")
@@ -27,13 +30,15 @@ neural_settings = get_neural_settings()
 
 class WhisperRecognizer(IRecognizer):
     _whisper: Whisper = Whisper(neural_settings.name)
-    _TASKS: dict[Task_id, dict[str, Any]] = {}
+
+    def __init__(self, storage: IRecognitionStorage):
+        self._storage = storage
 
     def _create_task_id(self):
         return uuid.uuid1().hex
 
-    @property
-    def name(self) -> str:
+    @classproperty
+    def name(cls) -> str:
         return neural_settings.name.replace(".", "").replace("/", "")
 
     def _run_task(self, task_id: Task_id, file: BinaryIO) -> None:
@@ -44,26 +49,35 @@ class WhisperRecognizer(IRecognizer):
         )
         thread_task.start()
 
+    def _create_task(self, task_id: Task_id):
+        self._task_structure = TaskIdStatus(task_id=task_id, status=Status.NEW)
+        self._storage.insert(self._task_structure)
+
+    def _update_task(self, status: Status, transcription: RecognizedText | None = None):
+        self._task_structure.status = status
+        if transcription:
+            self._task_structure.transcription = transcription
+        self._storage.insert(self._task_structure)
+
     def send(self, file: BinaryIO, format: str) -> Task_id:
+        # По идее, при создании task_id и Status.New - должна происходить постановка в очередь задач
         task_id = self._create_task_id()
-        self._TASKS[task_id] = {
-            "status": Status.PROCESSING,
-        }
+        self._create_task(task_id)
+        # TODO: Тут должна происходить постановка в очередь задач
+
         logger.info(f"Create task for Neural {self.name}: {task_id}")
         self._run_task(task_id, file)
         # audio_array = self.binay_io_to_numpy(audio_file)
         return task_id
 
-    def check_status(self, task_id: str) -> StatusFile:
-        status_info = self._TASKS.get(task_id, None)
-        if status_info is None:
-            return StatusFile()
+    def check_status(self, task_id: Task_id) -> StatusFile:
+        task_status = self._storage.select(task_id)
+        status_info = {"status": task_status.status}
         return StatusFile(**status_info)
 
     def download(self, task_id: Task_id) -> RecognizedText | None:
-        task_info = self._TASKS.get(task_id)
-        if task_info and task_info["status"] == Status.SUCCESS:
-            return self._processing_text(task_info["results"]["chunks"])
+        task_status = self._storage.select(task_id)
+        return task_status.transcription
 
     def _processing_text(self, chunks: list[dict[str, Any]]) -> RecognizedText:
         processing_text = [
@@ -108,13 +122,13 @@ class WhisperRecognizer(IRecognizer):
         return frame_rate, data
 
     def _transcribe(self, audio_file: BytesIO, task_id: str):
+        self._update_task(Status.PROCESSING)
         try:
             logger.debug(f"Transcribe audio:{audio_file=}")
             sr, y = self._audio_from_file(audio_file)
         except Exception as e:
             logger.warning(f"Close audio file {audio_file.name=}")
-            # audio_file.close()
-            self._TASKS[task_id]["status"] = Status.ERROR
+            self._update_task(Status.ERROR)
             logger.error(f"Error While coverting file to numpy: {e}")
             raise e
         try:
@@ -122,9 +136,13 @@ class WhisperRecognizer(IRecognizer):
         except NeuralException as e:
             logger.warning(f"Close audio file {audio_file.name=}")
             # audio_file.close()
-            self._TASKS[task_id]["status"] = Status.ERROR
+            self._update_task(Status.ERROR)
             logger.error(f"Error While transcribing: {e}")
             return
         else:
-            self._TASKS[task_id]["status"] = Status.SUCCESS
-            self._TASKS[task_id]["results"] = transcribed_text
+            self._update_task(
+                Status.SUCCESS,
+                self._processing_text(
+                    transcribed_text["chunks"],
+                ),
+            )
