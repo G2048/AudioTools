@@ -36,7 +36,7 @@ class AdapterSendRecognizeUseCase(SendRecognizeUseCase):
 
     def _create_temp_file(self, audiofile: UploadFile):
         tmp_file = NamedTemporaryFile(
-            suffix=self.FORMAT, delete=False, delete_on_close=False
+            suffix=f".{self.FORMAT}", delete=False, delete_on_close=False
         )
         tmp_file.write(audiofile.file.read())
         tmp_file.seek(0)
@@ -44,12 +44,13 @@ class AdapterSendRecognizeUseCase(SendRecognizeUseCase):
         return tmp_file
 
     def execute(self) -> Task_id:
+        f = open(self.audiofile.name, "rb")
         try:
-            f = open(self.audiofile.name, "rb")
             return super().execute(f)
         except RecognitionError as e:
             raise HTTPException(status_code=500, detail=e.detail)
         finally:
+            f.close()
             logger.debug(f"Delete temp file {self.audiofile.name=}")
             os.remove(self.audiofile.name)
 
