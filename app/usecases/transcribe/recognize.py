@@ -3,7 +3,7 @@ from typing import BinaryIO
 
 from app.interfaces.audio import IAudioConverter
 from app.interfaces.recognizers import IRecognizer, Task_id
-from app.interfaces.storages import ITaskStorage, TaskMessage
+from app.interfaces.storages import IHasher, ITaskStorage, TaskMessage
 
 logger = logging.getLogger("app.usecases.transcribe")
 
@@ -16,6 +16,10 @@ class AudioRecognitionError(RecognitionError):
     detail = "Error while converting audio"
 
 
+class HashRecognitionError(RecognitionError):
+    detail = "Error while get a hash audio file"
+
+
 class StorageRecognitionError(RecognitionError):
     detail = "Error to store audio task id"
 
@@ -26,10 +30,12 @@ class SendRecognizeUseCase:
         recognizer: IRecognizer,
         audio_converter: IAudioConverter,
         storage: ITaskStorage,
+        hasher: IHasher,
     ):
         self.recognizer = recognizer
         self.converter = audio_converter
         self.storage = storage
+        self.hasher = hasher
 
     def execute(self, audio_file: BinaryIO) -> Task_id:
         try:
@@ -44,12 +50,21 @@ class SendRecognizeUseCase:
             except Exception as e:
                 logger.error(f"Error while sending audio to recognizer: {e}")
                 raise RecognitionError
+            finally:
+                f.seek(0)
+
+            try:
+                file_id = self.hasher.hash(f)
+            except Exception as e:
+                logger.error(f"Error while hashing audio: {e}")
+                raise HashRecognitionError
+
         try:
             self.storage.set(
                 TaskMessage(
                     task_id=task_id,
                     recognizer=self.recognizer.name,
-                    file_id=audio_file.name,
+                    file_id=file_id,
                 )
             )
         except Exception as e:

@@ -29,10 +29,6 @@ class WhisperRecognizer(IRecognizer):
     _whisper: Whisper = Whisper(neural_settings.name)
     _TASKS: dict[Task_id, dict[str, Any]] = {}
 
-    @staticmethod
-    def _create_file_id() -> str:
-        return str(uuid.uuid1())
-
     def _create_task_id(self):
         return uuid.uuid1().hex
 
@@ -52,7 +48,6 @@ class WhisperRecognizer(IRecognizer):
         task_id = self._create_task_id()
         self._TASKS[task_id] = {
             "status": Status.PROCESSING,
-            "file_id": self._create_file_id(),
         }
         logger.info(f"Create task for Neural {self.name}: {task_id}")
         self._run_task(task_id, file)
