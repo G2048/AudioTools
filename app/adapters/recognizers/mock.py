@@ -6,11 +6,13 @@ from typing import BinaryIO
 
 from app.interfaces.recognizers import (
     Chunk,
+    IRecognitionStorage,
     IRecognizer,
     RecognizedText,
     Status,
     StatusFile,
     Task_id,
+    classproperty,
 )
 
 logger = logging.getLogger("app.adapters.recognizers")
@@ -19,6 +21,9 @@ logger = logging.getLogger("app.adapters.recognizers")
 class MockRecognizer(IRecognizer):
     _tasks: dict[Task_id, StatusFile] = {}
 
+    def __init__(self, storage: IRecognitionStorage):
+        super().__init__(storage)
+
     def _create_task_id(self) -> str:
         return uuid.uuid1().hex
 
@@ -26,7 +31,7 @@ class MockRecognizer(IRecognizer):
     def _create_file_id() -> str:
         return str(uuid.uuid1())
 
-    @property
+    @classproperty
     def name(self) -> str:
         return "mock"
 

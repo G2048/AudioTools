@@ -31,8 +31,8 @@ class Providers:
 
 
 _recognizers_fabric = Providers()
-_recognizers_fabric.register(recognizers.MockRecognizer())
-_recognizers_fabric.register(recognizers.WhisperRecognizer())
+_recognizers_fabric.register(recognizers.MockRecognizer)
+_recognizers_fabric.register(recognizers.WhisperRecognizer)
 # classes = tuple(filter(lambda x: x.istitle(), dir(recognizers)))
 # print(f"Register recognizers: {classes}")
 # print(f"{dir(recognizers)=}")
