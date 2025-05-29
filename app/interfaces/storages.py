@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import BinaryIO, NewType
 
 from pydantic import BaseModel
 
@@ -31,3 +32,21 @@ class ITaskStorage(ABC):
     @abstractmethod
     def list(self) -> list[TaskMessage] | None:
         pass
+
+
+HashedFile = NewType("HashedFile", str)
+
+
+class IHasher(ABC):
+    @property
+    @abstractmethod
+    def name(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def empty_value(self) -> str:
+        pass
+
+    @abstractmethod
+    def hash(self, bfile: BinaryIO) -> HashedFile: ...
