@@ -21,3 +21,4 @@ class TestSha1Hasher(unittest.TestCase):
             self.assertIsInstance(hash_file, str)
         prev_hash = self.hasher._hasher.hexdigest()
         self.assertEqual(prev_hash, self.hasher.empty_value)
+        self.assertNotEqual(hash_file, self.hasher.empty_value)
