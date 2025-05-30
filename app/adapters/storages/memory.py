@@ -61,11 +61,15 @@ class RedisTaskStorage(ITaskStorage, RedisMixin):
         return TaskMessage.model_validate(message)
 
     def list(self) -> list[TaskMessage] | None:
+        task_messages = []
         messages = self.store.all(self.TASKS_KEY)
         logger.debug(f"Response TaskMessage: {messages}")
-        if not messages:
-            return []
-        return [self.get(task_id) for task_id in messages.keys()]
+
+        for task_id in messages.keys():
+            message = self.store.all(task_id)
+            if message:
+                task_messages.append(TaskMessage.model_validate(message))
+        return task_messages
 
 
 class RedisRecognitionStorage(IRecognitionStorage, RedisMixin):
