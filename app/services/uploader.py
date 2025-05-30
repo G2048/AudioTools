@@ -3,9 +3,11 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, Self
 
-from app.aws import S3Bucket, S3Client
 from app.configs.settings import AwsBucketSettingsConfig, AwsSettingsConfig
+from app.drivers.aws import S3Bucket, S3Client
 from app.interfaces import IFile, IUploader
+
+logger = logging.getLogger("app.services.uploader")
 
 
 class S3File(IFile):
@@ -13,7 +15,7 @@ class S3File(IFile):
         self.s3_bucket = s3bucket
         self.file_name = Path(file)
         self.path = self._create_path_file(file_path)
-        self._logger = logging.getLogger("app.services.uploader")
+        self._logger = logger
 
     @property
     def name(self) -> str:
