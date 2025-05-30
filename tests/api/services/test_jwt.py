@@ -1,6 +1,6 @@
 import unittest
 
-from app.services.jwt import JWT, JwtPayload
+from app.api.services.jwt import JWT, JwtPayload
 
 
 class TestJwt(unittest.TestCase):
