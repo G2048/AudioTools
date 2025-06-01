@@ -45,6 +45,15 @@ class EmailSettings(BaseSettings):
     sender: str
 
 
+class S3SettingsConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="S3_", case_sensitive=False)
+
+    endpoint_url: str
+    access_key: str
+    secret_key: str
+    session_token: Optional[str] = None
+
+
 class AwsSettingsConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="AWS_")
 
