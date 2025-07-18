@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import BinaryIO, Optional, TypeAlias
 
 from botocore.httpchecksum import StreamingChecksumBody
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
+from botocore.response import StreamingBody
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 HTTPStatus: TypeAlias = int
 
@@ -110,10 +111,10 @@ class ResponseGetObject(ResponseHead):
     last_modified: datetime = Field(alias="LastModified")
 
     content_length: int = Field(alias="ContentLength")
-    check_sum: str = Field(alias="ChecksumCRC32")
+    check_sum: str | None = Field(alias="ChecksumCRC32", default=None)
     content_type: str = Field(alias="ContentType")
     metadata_object: dict[str, str] = Field(alias="Metadata", default_factory=dict)
-    body: StreamingChecksumBody = Field(alias="Body")
+    body: StreamingChecksumBody | StreamingBody = Field(alias="Body")
 
 
 # For list_objects v1 and v2
