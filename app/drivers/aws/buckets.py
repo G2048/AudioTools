@@ -103,6 +103,11 @@ class S3Object:
         self.bucket_name = bucket.bucket_name
         self.object_name = object_name
 
+    def put(self, file_body: bytes) -> None:
+        self.s3_client.put_object(
+            Body=file_body, Bucket=self.bucket_name, Key=self.object_name
+        )
+
     def upload(self, full_path_to_file: str) -> None:
         self.s3_client.upload_file(
             full_path_to_file, self.bucket_name, self.object_name
