@@ -1,10 +1,7 @@
-import json
-
-
 class ClientHTTPException(Exception):
-    def __init__(self, status_code: str | int, detail: str = ""):
+    def __init__(self, status_code: str | int, detail: dict | None = None):
         self.status_code = status_code
-        self.detail = json.loads(detail)
+        self.detail = detail
         super().__init__(status_code, detail)
 
     def __str__(self):

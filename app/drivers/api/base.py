@@ -29,6 +29,18 @@ class BaseApi:
     def _concat_url(self, url: str):
         return self.URL + url
 
+    def __handle_response(self):
+        self._status_code = self._response.status_code
+        self.logger.debug(self._response.status_code)
+
+        response = self._validateJson(self._response.json)
+        if not response:
+            response = {"text": self._response.text}
+
+        if self._response.status_code < 300:
+            return response
+        raise ClientHTTPException(self._response.status_code, response)
+
     def _request(self, url, query_params=None, method="GET", **kwargs) -> dict:
         url = self._concat_url(url)
         self.logger.debug(f"{url}, {query_params=}, {self.HEADERS=}")
@@ -47,16 +59,7 @@ class BaseApi:
             raise e
         finally:
             self.HEADERS.update({"Content-Type": "application/json"})
-
-        self.status_code = self._response.status_code
-        self.logger.debug(self._response.status_code)
-        if self._response.status_code < 300:
-            response_json = self._validateJson(self._response.json)
-            if response_json:
-                return response_json
-            return {"text": self._response.text}
-        else:
-            raise ClientHTTPException(self._response.status_code, self._response.text)
+        self.__handle_response()
 
     async def _arequest(self, url: str, query_params=None, method="GET", **kwargs):
         url = self.URL + url
@@ -76,15 +79,7 @@ class BaseApi:
         finally:
             self.HEADERS.update({"Content-Type": "application/json"})
 
-        self.status_code = self._response.status_code
-        self.logger.debug(self._response.status_code)
-        if self._response.status_code < 300:
-            response_json = self._validateJson(self._response.json)
-            if response_json:
-                return response_json
-            return {"text": self._response.text}
-        else:
-            raise ClientHTTPException(self._response.status_code, self._response.text)
+        self.__handle_response()
 
     @property
     def status_code(self) -> int | None:
