@@ -34,7 +34,7 @@ class BaseApi:
         self.logger.debug(self._response.status_code)
 
         response = self._validateJson(self._response.json)
-        if not response:
+        if response is None:
             response = {"text": self._response.text}
 
         if self._response.status_code < 300:
